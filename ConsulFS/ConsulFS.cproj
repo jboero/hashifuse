@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{03C969A9-C466-499F-BF08-1E837F9166F4}</ProjectGuid>
+    <Compiler>
+      <Compiler ctype="GppCompiler" />
+    </Compiler>
+    <Language>CPP</Language>
+    <Target>Bin</Target>
+    <Packages>
+      <Packages>
+        <Package file="/usr/lib64/pkgconfig/fuse.pc" name="fuse" IsProject="False" />
+        <Package file="/usr/lib64/pkgconfig/libcurl.pc" name="libcurl" IsProject="False" />
+        <Package file="/usr/lib64/pkgconfig/jsoncpp.pc" name="jsoncpp" IsProject="False" />
+      </Packages>
+    </Packages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug</OutputPath>
+    <OutputName>consulfs</OutputName>
+    <CompileTarget>Bin</CompileTarget>
+    <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
+    <SourceDirectory>.</SourceDirectory>
+    <ExtraCompilerArguments>-g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="CONSUL_HTTP_ADDR" value="localhost:8500" />
+        <Variable name="CONSUL_HTTP_TOKEN" value="" />
+        <Variable name="CONSUL_HTTP_AUTH" value="" />
+        <Variable name="CONSUL_HTTP_SSL" value="false" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+    <Commandlineparameters>-d -s -o direct_io /mnt/consul</Commandlineparameters>
+    <WarningLevel>All</WarningLevel>
+    <OptimizationLevel>3</OptimizationLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release</OutputPath>
+    <OutputName>consulfs</OutputName>
+    <CompileTarget>Bin</CompileTarget>
+    <DefineSymbols>MONODEVELOP</DefineSymbols>
+    <SourceDirectory>.</SourceDirectory>
+    <Commandlineparameters>-o direct_io /mnt/consul</Commandlineparameters>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="CONSUL_HTTP_ADDR" value="localhost:8500" />
+        <Variable name="CONSUL_HTTP_TOKEN" value="" />
+        <Variable name="CONSUL_HTTP_SSL" value="false" />
+        <Variable name="CONSUL_HTTP_AUTH" value="" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+    <ExtraCompilerArguments>-D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
+    <OptimizationLevel>3</OptimizationLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="StdColors.h" />
+    <None Include="Makefile" />
+    <None Include="Config\run.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
+  </ItemGroup>
+</Project>

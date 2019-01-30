@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{46DDC3BA-9691-4278-99D7-23F97F76C619}</ProjectGuid>
+    <Compiler>
+      <Compiler ctype="GppCompiler" />
+    </Compiler>
+    <Language>CPP</Language>
+    <Target>Bin</Target>
+    <Packages>
+      <Packages>
+        <Package file="/usr/lib64/pkgconfig/fuse.pc" name="fuse" IsProject="False" />
+        <Package file="/usr/lib64/pkgconfig/libcurl.pc" name="libcurl" IsProject="False" />
+        <Package file="/usr/lib64/pkgconfig/jsoncpp.pc" name="jsoncpp" IsProject="False" />
+      </Packages>
+    </Packages>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug</OutputPath>
+    <OutputName>vaultfs</OutputName>
+    <CompileTarget>Bin</CompileTarget>
+    <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
+    <SourceDirectory>.</SourceDirectory>
+    <ExtraCompilerArguments>-g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
+    <Commandlineparameters>-d -s -o direct_io /mnt/vault</Commandlineparameters>
+    <ExtraLinkerArguments>-lfuse</ExtraLinkerArguments>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="VAULT_TOKEN" value="eutjguU5DT6D5KF8UVRkKGQI" />
+        <Variable name="VAULT_ADDR" value="http://localhost:8200" />
+        <Variable name="no_proxy" value="localhost" />
+        <Variable name="http_proxy" value="" />
+        <Variable name="https_proxy" value="" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release</OutputPath>
+    <OutputName>vaultfs</OutputName>
+    <CompileTarget>Bin</CompileTarget>
+    <DefineSymbols>MONODEVELOP</DefineSymbols>
+    <SourceDirectory>.</SourceDirectory>
+    <Commandlineparameters>-o big_writes,max_write=262144,max_read=131072 /mnt/gpu</Commandlineparameters>
+    <ExtraCompilerArguments>-std=c++11 -D_FILE_OFFSET_BITS=64 </ExtraCompilerArguments>
+    <Externalconsole>true</Externalconsole>
+    <OptimizationLevel>3</OptimizationLevel>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="VAULT_TOKEN" value="eutjguU5DT6D5KF8UVRkKGQI" />
+        <Variable name="VAULT_ADDR" value="http://localhost:8200" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+    <ConsolePause>false</ConsolePause>
+    <ExtraLinkerArguments>-lrt -lpthread -lfuse -lOpenCL</ExtraLinkerArguments>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="StdColors.h" />
+    <None Include="Config\run.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
+  </ItemGroup>
+</Project>

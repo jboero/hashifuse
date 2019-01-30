@@ -1,0 +1,21 @@
+﻿<Properties StartupItem="NomadFS/NomadFS.cproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="NomadFS/main.cpp">
+    <Files>
+      <File FileName="VaultFS/main.cpp" Line="3" Column="17" />
+      <File FileName="ConsulFS/main.cpp" Line="8" Column="3" />
+      <File FileName="NomadFS/main.cpp" Line="8" Column="3" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="../gunzip/gunzip.c" line="389" offsetX="608" offsetY="9700" expression="code_lengths_node-&gt;code" liveUpdate="False" />
+    <Watch file="../gunzip/gunzip.c" line="401" offsetX="932" offsetY="10000" expression="repeat_length" liveUpdate="False" />
+    <Watch file="../Maws/MainMawgs.cpp" line="64" offsetX="500" offsetY="1575" expression="path" liveUpdate="False" />
+    <Watch file="../Maws/MainMawgs.cpp" line="546" offsetX="548" offsetY="13625" expression="cval" liveUpdate="False" />
+    <Watch file="../Maws/LSockets.cpp" line="155" offsetX="188" offsetY="1848" expression="arg" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+  <AuthorInfo Name="John Boero" Email="jboero@hashicorp.com" Copyright="John Boero" Company="Hashicorp" Trademark="" />
+</Properties>
