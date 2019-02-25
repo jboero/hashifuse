@@ -11,6 +11,7 @@ $ export VAULT_ADDR=http://localhost:8200
 $ export VAULT_TOKEN=[YOUR TOKEN]
 $ vaultfs -o direct_io /mnt/vault (or your mount path)
 ```
+In the event you need to specify a CA bundle, libcurl doesn't seem to use curl's standard environment variables.  Instead you can place your PEM bundle into ~/vaultfs.pem and vaultfs will attempt to use it.  This allows self-signed certs which isn't recommended for production.
 
 For debugging, best results via single threaded DEBUG build:
 ```
