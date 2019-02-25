@@ -1,10 +1,8 @@
-﻿<Properties StartupItem="NomadFS/NomadFS.cproj">
+﻿<Properties StartupItem="VaultFS/VaultFS.cproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="NomadFS/main.cpp">
+  <MonoDevelop.Ide.Workbench ActiveDocument="VaultFS/main.cpp">
     <Files>
-      <File FileName="VaultFS/main.cpp" Line="3" Column="17" />
-      <File FileName="ConsulFS/main.cpp" Line="8" Column="3" />
-      <File FileName="NomadFS/main.cpp" Line="8" Column="3" />
+      <File FileName="VaultFS/main.cpp" Line="242" Column="63" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

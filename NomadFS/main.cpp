@@ -13,7 +13,7 @@
 	NOMADFS_LOG			optional log file path.
 ****************************************************************************/
 
-#define FUSE_USE_VERSION 30
+#define FUSE_USE_VERSION 28
 //#define CURL_STATICLIB
 //#define _GNU_SOURCE
 
