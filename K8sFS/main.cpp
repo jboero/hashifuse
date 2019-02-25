@@ -148,7 +148,7 @@ int	k8sCURLjson(string url, Json::Value &jsonData, string request = "GET", strin
 // Helper to translate fs path to correct REST path.
 string getRESTbase(string fspath)
 {
-	if (regex_match(fspath, (regex)"^/(.*)/(daemonsets|deployments|replicasets)$"))
+	if (regex_match(fspath, (regex)"^/(.*)/(daemonsets|deployments|replicasets)(.*)$"))
 		return "/apis/apps/v1/namespaces";
 	else if (regex_match(fspath, (regex)"^/(.*)/(cronjobs)$"))
 		return "/apis/batch/v1beta1/namespaces";
