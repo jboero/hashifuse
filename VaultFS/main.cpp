@@ -463,7 +463,7 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 			// Remove trailing /
 			if (iter->find('/') == iter->length() - 1)
 				iter->pop_back();
-			cout << *iter << endl;
+			//cout << *iter << endl; // Debug stub.
 			filler(buf, iter->c_str(), NULL, 0);
 		}
 		return 0;

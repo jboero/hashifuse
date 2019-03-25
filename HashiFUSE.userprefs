@@ -1,6 +1,6 @@
 ﻿<Properties StartupItem="VaultFS/VaultFS.cproj" GitUserInfo="UsingGIT">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="VaultFS/main.cpp">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="VaultFS/main.cpp" Line="268" Column="33" />
       <File FileName="K8sFS/main.cpp" Line="1" Column="1" />
