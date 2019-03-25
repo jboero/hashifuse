@@ -32,8 +32,7 @@
     <WarningLevel>All</WarningLevel>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="KUBE_APISERVER" value="https://35.234.148.238" />
-        <Variable name="CURL_CA_BUNDLE" value="/home/jboero/k8s.pem" />
+        <Variable name="KUBE_APISERVER" value="http://localhost:8080" />
         <Variable name="KUBE_TOKEN" value="ya29.Gl20Bh9faZMHsgVc2Z2IRr5wE61RhnFbRkIpysd5gDqFATP33llSC4qLdUzVJPu3yI8SvQXDtRjq4_vsyNvdMrK4GHYySQnUZI17-FS2K7lSLJFom_03mfZX3juf22s" />
       </EnvironmentVariables>
     </EnvironmentVariables>
@@ -58,6 +57,7 @@
     <None Include="Config\run.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.cpp" />

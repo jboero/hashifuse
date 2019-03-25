@@ -176,11 +176,11 @@ int cacheMounts()
 	vector<string> removers;
 	if (vaultCURLjson(apiVers + "/sys/mounts", gMounts))
 		return -EINVAL;
-
+	
 	for (Json::Value::const_iterator it = gMounts.begin(); it != gMounts.end(); ++it)
 		if (!(it->isObject() && it->isMember("type")))
 			removers.push_back(it.key().asString());
-
+	
 	// Clear out garbage members that aren't actually mounts with type.
 	for (vector<string>::iterator rm = removers.begin(); rm != removers.end(); ++rm)
 		gMounts.removeMember(*rm);
@@ -232,6 +232,8 @@ int vault_getattr(const char *path, struct stat *stat)
 	}
 
 	string mountType = getMountType(p);
+	if (mountType == "")
+		return -ENOENT;
 
 	// Get capabilities for this path.
 	// example payload: {"paths": ["secret/foo"]}
@@ -254,14 +256,22 @@ int vault_getattr(const char *path, struct stat *stat)
  
 		return 0;
 	}
+	else if (mountType == "system")
+	{
+		if (regex_match(p, (regex)"(.*)/(leases|tools|namespaces|config|policy)"))
+			stat->st_mode = S_IFDIR | 0700;
+		else
+			stat->st_mode = S_IFREG | 0600;
+	}
 	else
 	{
-		stat->st_mode = S_IFREG;
+		stat->st_mode = S_IFREG | 0600;
 	}
 
 	// Isolate the single dir/mount we need.
-	dir = gMounts[p];
-
+	//TODO - this is phantom creation....
+	//dir = gMounts[p];
+	/*
 	for (Json::Value::ArrayIndex i = 0; i != dir.size(); ++i)
 	{
 		if (!dir[i].isString())
@@ -278,6 +288,7 @@ int vault_getattr(const char *path, struct stat *stat)
 		else if (cap == "list")
 			stat->st_mode |= S_IFDIR | 0100;
 	}
+	*/
 	return 0;
 }
 
@@ -449,8 +460,10 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 		vector<string> members = gMounts.getMemberNames();
 		for(vector<string>::iterator iter = members.begin(); iter != members.end(); ++iter)
 		{
+			// Remove trailing /
 			if (iter->find('/') == iter->length() - 1)
 				iter->pop_back();
+			cout << *iter << endl;
 			filler(buf, iter->c_str(), NULL, 0);
 		}
 		return 0;
@@ -528,14 +541,23 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 	}
 	else if (mountType == "system")
 	{
-		filler(buf, "config", NULL, 0);
-		filler(buf, "health", NULL, 0);
-		filler(buf, "license", NULL, 0);
-		filler(buf, "namespaces", NULL, 0);
-		filler(buf, "mounts", NULL, 0);
-		filler(buf, "replication", NULL, 0);
-		filler(buf, "tools", NULL, 0);
-		return 0;
+		if (p == "sys/")
+		{
+			filler(buf, "config", NULL, 0);
+			filler(buf, "health", NULL, 0);
+			filler(buf, "license", NULL, 0);
+			filler(buf, "namespaces", NULL, 0);
+			filler(buf, "mounts", NULL, 0);
+			filler(buf, "replication", NULL, 0);
+			filler(buf, "tools", NULL, 0);
+			filler(buf, "policy", NULL, 0);
+			return 0;
+		}
+		else if (p == "sys/policy/")
+		{
+			if (res = vaultCURLjson(apiVers + "/sys/policies", keys, "LIST"))
+				return -ENOENT;
+		}
 	}
 
 	// TODO add other types or inheritance

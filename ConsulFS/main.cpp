@@ -243,7 +243,12 @@ int consul_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t of
 
 	if (p == "/")
 	{
-		filler(buf, "kv", NULL, 0);
+		if (consulCURLjson(apiVers + p + "/catalog/datacenters", keys))
+			return -ENOENT;
+		
+		filler(buf, "health", NULL, 0);
+
+
 		return 0;
 	}
 

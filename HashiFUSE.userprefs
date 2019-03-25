@@ -1,8 +1,11 @@
 ﻿<Properties StartupItem="VaultFS/VaultFS.cproj" GitUserInfo="UsingGIT">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
   <MonoDevelop.Ide.Workbench ActiveDocument="VaultFS/main.cpp">
     <Files>
-      <File FileName="VaultFS/main.cpp" Line="242" Column="63" />
+      <File FileName="VaultFS/main.cpp" Line="268" Column="33" />
+      <File FileName="K8sFS/main.cpp" Line="1" Column="1" />
+      <File FileName="ConsulFS/main.cpp" Line="1" Column="1" />
+      <File FileName="../../../../usr/include/c++/8/bits/basic_string.h" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
