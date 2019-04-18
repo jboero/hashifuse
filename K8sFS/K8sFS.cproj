@@ -23,7 +23,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug</OutputPath>
-    <OutputName>nomadfs</OutputName>
+    <OutputName>k8sfs</OutputName>
     <CompileTarget>Bin</CompileTarget>
     <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
     <SourceDirectory>.</SourceDirectory>
@@ -33,7 +33,7 @@
     <EnvironmentVariables>
       <EnvironmentVariables>
         <Variable name="KUBE_APISERVER" value="http://localhost:8080" />
-        <Variable name="KUBE_TOKEN" value="ya29.Gl20Bh9faZMHsgVc2Z2IRr5wE61RhnFbRkIpysd5gDqFATP33llSC4qLdUzVJPu3yI8SvQXDtRjq4_vsyNvdMrK4GHYySQnUZI17-FS2K7lSLJFom_03mfZX3juf22s" />
+        <Variable name="KUBE_TOKEN" value="XXXX" />
       </EnvironmentVariables>
     </EnvironmentVariables>
   </PropertyGroup>
@@ -52,12 +52,12 @@
     </EnvironmentVariables>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="StdColors.h" />
     <None Include="Makefile" />
     <None Include="Config\run.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="README.md" />
+    <None Include="Config\k8sfs-rpm.spec" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.cpp" />

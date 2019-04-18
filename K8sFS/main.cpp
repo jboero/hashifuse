@@ -1,12 +1,17 @@
 ﻿/****************************************************************************
 **
-** k8sFS - FUSE client for Kubernetes manifests.
+** k8sFS - FUSE2 client for Kubernetes manifests.
 **
 ** Authored by John Boero
 ** Build instructions: g++ -D_FILE_OFFSET_BITS=64 -lfuse -lcurl -ljsoncpp main.cpp
 ** Usage: ./k8sfs -o direct_io /path/to/mount
 **
 ** Note direct_io is mandatory right now until we can get key size in getattrs.
+** Note this is currently a highly experimental draft.  Reads should be ok.
+**	Writes are much trickier as Kube API is not very idempotent-friendly.
+**	Reading an endpoint gives extra attributes that often can't be written back,
+**	for example - read gets a timestamp.  write can't apply a timestamp, etc.
+** 
 ** Environment Variables: 
 	KUBE_APISERVER		k8s addr.  Example: "https://localhost:4646"
 	KUBE_TOKEN			optional k8s token for auth.
@@ -30,7 +35,6 @@
 #include <mutex>
 #include <regex>
 
-#include "StdColors.h"
 #include <fuse.h>
 
 using namespace std;
@@ -40,6 +44,15 @@ ostream *logs = &cout;
 
 // Protect multi-threaded mode from libcurl/libopenssl race condition.
 mutex curlmutex;
+
+// Term colors for stdout
+const char RESET[]	= "\033[0m";
+const char RED[]	= "\033[1;31m";
+const char YELLOW[]	= "\e[0;33m";
+const char CYAN[]	= "\e[1;36m";
+const char PURPLE[]	= "\e[0;35m";
+const char GREEN[]	= "\e[0;32m";
+const char BLUE[]	= "\e[0;34m";
 
 // CURL callback
 namespace
@@ -66,7 +79,6 @@ namespace
 // Easy libcurl
 // Currently supports request GET (default), PUT, LIST, DELETE
 // TODO: sanitize environment variables for injection vulnerabilities.
-// TODO: change stringstream reference to ptr as we don't always need it.
 int	k8sCURL(string url, stringstream *httpData = NULL, string request = "GET", const string data = "")
 {
 	int httpCode = 0;

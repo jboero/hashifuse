@@ -125,7 +125,7 @@ int	vaultCURL(string url, stringstream &httpData, string request = "GET", const 
 		if (res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers))
 			return res;
 
-		curl_easy_setopt(curl, CURLOPT_TIMEOUT, 1);
+		curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
 		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &httpData);
@@ -158,7 +158,6 @@ int	vaultCURLjson(string url, Json::Value &jsonData, string request = "GET", str
 {
 	stringstream stream;
 	Json::CharReaderBuilder jsonReader;
-	string errs;
 	int	res = 0;
 
 	if (res = vaultCURL(url, stream, request, post))
@@ -247,7 +246,7 @@ int vault_getattr(const char *path, struct stat *stat)
 		else
 			stat->st_mode = S_IFDIR | 0700;
 	}
-	else if (regex_match(mountType, (regex)"(pki|ssh|transit|totp)"))
+	else if (regex_match(mountType, (regex)"(pki|ssh|transit|totp|aws|gcp|azure)"))
 	{
 		if (slashes > 2)
 			stat->st_mode = S_IFREG | 0600;
@@ -294,9 +293,11 @@ int vault_getattr(const char *path, struct stat *stat)
 
 int vault_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
-	string p(path + 1), mountType, raw;
+	static string raw;
+	string p(path + 1), mountType;
 	Json::Value mount, data;
 	Json::StreamWriterBuilder builder;
+	stringstream stream;
 	int res, len;
 	size_t mlen;
 
@@ -335,22 +336,21 @@ int vault_read(const char *path, char *buf, size_t size, off_t offset, struct fu
 
 	/*********************************************************************/
 	// Rewrite options:
-	if (mountType == "pki" && regex_match(p, (regex)"^(.*)/certs/(.*)$"))
+	if (mountType == "pki")
 	{
-		// Annoyingly, list is /pki/certs, but read is /pki/cert/$serial
-		// We need to pick out that pesky 's'
-		size_t s = p.find("/certs/");
-		p.erase(s + 5, 1);
-	}
-
-	/*********************************************************************/
-	// JSON/RAW: Annoyingly, some paths are JSON, some are raw.
-	if (mountType == "pki" && regex_match(p, (regex)"^(.*)/ca/pem$"))
-	{
-		stringstream stream;
-		if (res = vaultCURL(apiVers + '/' + p, stream))
-			return -ENOENT;
-		raw = stream.str();
+		if (regex_match(p, (regex)"^(.*)/certs/(.*)$"))
+		{
+			// Annoyingly, list is /pki/certs, but read is /pki/cert/$serial
+			// We need to pick out that pesky 's'
+			size_t s = p.find("/certs/");
+			p.erase(s + 5, 1);
+		}
+		else if (regex_match(p, (regex)"^(.*)/ca/pem$"))
+		{
+			if (res = vaultCURL(apiVers + '/' + p, stream))
+				return -ENOENT;
+			raw = stream.str();
+		}
 	}
 	else
 	{
@@ -463,7 +463,6 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 			// Remove trailing /
 			if (iter->find('/') == iter->length() - 1)
 				iter->pop_back();
-			//cout << *iter << endl; // Debug stub.
 			filler(buf, iter->c_str(), NULL, 0);
 		}
 		return 0;
@@ -538,6 +537,28 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 		}
 		//else if (p == smount + "keys/") // fallback to default handler.
 		// TODO browse versions.
+	}
+	else if (mountType == "gcp")
+	{
+		if (p == smount)
+		{
+			filler(buf, "config", NULL, 0);
+			filler(buf, "roleset", NULL, 0);
+			filler(buf, "token", NULL, 0);
+			filler(buf, "key", NULL, 0);
+			return 0;
+		}
+	}
+	else if (mountType == "aws" || mountType == "azure")
+	{
+		if (p == smount)
+		{
+			filler(buf, "config", NULL, 0);
+			filler(buf, "roles", NULL, 0);
+			filler(buf, "creds", NULL, 0);
+			filler(buf, "sts", NULL, 0);
+			return 0;
+		}
 	}
 	else if (mountType == "system")
 	{
