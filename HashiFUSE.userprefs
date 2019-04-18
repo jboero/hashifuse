@@ -1,4 +1,4 @@
-﻿<Properties StartupItem="TFEFS/TFEFS.cproj" GitUserInfo="UsingGIT">
+﻿<Properties StartupItem="VaultFS/VaultFS.cproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="K8sFS/main.cpp">
     <Files>
