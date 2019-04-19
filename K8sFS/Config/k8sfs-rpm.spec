@@ -2,7 +2,7 @@
 Version:        0.1
 Release:        1
 Summary:        Hashicorp Kubernetes Fuse Agent
-License:        Hashicorp
+License:        GPL+
 Source0:        k8sfs
 Requires(post): libcurl fuse jsoncpp
 URL:            https://www.consul.io/

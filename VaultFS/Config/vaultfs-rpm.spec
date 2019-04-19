@@ -2,7 +2,7 @@
 Version:        0.1
 Release:        1
 Summary:        Hashicorp VaultFS Fuse Agent
-License:        Hashicorp
+License:        GPL+
 Source0:        vaultfs
 Requires(post): libcurl fuse jsoncpp
 URL:            https://www.vaultproject.io/

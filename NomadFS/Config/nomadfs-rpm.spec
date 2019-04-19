@@ -2,7 +2,7 @@
 Version:        0.1
 Release:        1
 Summary:        Hashicorp NomadFS Fuse Agent
-License:        Hashicorp
+License:        GPL+
 Source0:        nomadfs
 Requires(post): libcurl fuse jsoncpp
 URL:            https://www.nomadproject.io/

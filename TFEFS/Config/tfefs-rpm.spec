@@ -2,7 +2,7 @@
 Version:        0.1
 Release:        1
 Summary:        Hashicorp Terraform Enterprise Fuse Agent
-License:        Hashicorp
+License:        GPL+
 Source0:        tfefs
 Requires(post): libcurl fuse jsoncpp
 URL:            https://www.terraform.io/
