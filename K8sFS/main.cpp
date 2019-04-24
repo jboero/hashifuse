@@ -16,7 +16,8 @@
 	KUBE_APISERVER		k8s addr.  Example: "https://localhost:4646"
 	KUBE_TOKEN			optional k8s token for auth.
 	k8sFS_LOG			optional log file path.
-	CURL_CA_BUNDLE		optional manual CA PEM for libcurl
+	K8SFS_CA_PEM		optional manual CA PEM for libcurl
+	K8SFS_CLIENT_CERT	optional manual client PEM (cert + key)
 ****************************************************************************/
 
 #define FUSE_USE_VERSION 28
@@ -117,7 +118,10 @@ int	k8sCURL(string url, stringstream *httpData = NULL, string request = "GET", c
 
 		// Note the ENV variable curl standardizes on has no effect sadly.
 		// TODO: Robustify ca bundle...
-		curl_easy_setopt(c, CURLOPT_CAINFO, "~/k8s.pem");
+		if (getenv("K8SFS_CA_PEM"))
+			curl_easy_setopt(c, CURLOPT_CAINFO, getenv("K8SFS_CA_PEM"));
+		if (getenv("K8SFS_CLIENT_CERT"))
+			curl_easy_setopt(c, CURLOPT_SSLCERT, getenv("K8SFS_CLIENT_CERT"));
 
 		if (data != "")
 		{
@@ -158,6 +162,7 @@ int	k8sCURLjson(string url, Json::Value &jsonData, string request = "GET", strin
 }
 
 // Helper to translate fs path to correct REST path.
+// Your mileage may vary based on K8s release...
 string getRESTbase(string fspath)
 {
 	if (regex_match(fspath, (regex)"^/(.*)/(daemonsets|deployments|replicasets)(.*)$"))
@@ -292,6 +297,23 @@ int k8s_chmod(const char *path, mode_t mode)
 	return 0;
 }
 
+// Return stat of root fs (partition).
+int k8s_statfs(const char *path, struct statvfs *statv)
+{
+	statv->f_bsize	= 
+	statv->f_frsize	= 
+	statv->f_blocks	= 
+	statv->f_bfree	= 
+	statv->f_bavail	= 32768;
+	statv->f_files	= 15;
+	statv->f_bfree	= 15;
+	statv->f_favail	= 10000;
+	statv->f_fsid	= 100;
+	statv->f_flag	= 0;
+	statv->f_namemax = 0xFFFF;
+	return 0;
+}
+
 // Init curl subsystem and set up log stream.
 void* k8s_init(struct fuse_conn_info *conn)
 {
@@ -332,6 +354,7 @@ int main(int argc, char *argv[])
 		.truncate = k8s_truncate,
 		.read = k8s_read,
 		.write = k8s_write,
+		.statfs = k8s_statfs,
 		.readdir = k8s_readdir,
 		.init = k8s_init,
 		.destroy = k8s_destroy,

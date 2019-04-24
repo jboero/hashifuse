@@ -1,8 +1,8 @@
-﻿<Properties StartupItem="VaultFS/VaultFS.cproj" GitUserInfo="UsingGIT">
+﻿<Properties StartupItem="K8sFS/K8sFS.cproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="K8sFS/main.cpp">
     <Files>
-      <File FileName="K8sFS/main.cpp" Line="25" Column="1" />
+      <File FileName="K8sFS/main.cpp" Line="111" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

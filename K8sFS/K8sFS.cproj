@@ -32,8 +32,10 @@
     <WarningLevel>All</WarningLevel>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="KUBE_APISERVER" value="http://localhost:8080" />
+        <Variable name="KUBE_APISERVER" value="https://kubernetes:6443" />
         <Variable name="KUBE_TOKEN" value="XXXX" />
+        <Variable name="K8SFS_CA_PEM" value="/home/jboero/k8s.ca" />
+        <Variable name="K8SFS_CLIENT_CERT" value="/home/jboero/k8s.pem" />
       </EnvironmentVariables>
     </EnvironmentVariables>
   </PropertyGroup>
