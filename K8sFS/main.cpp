@@ -14,10 +14,11 @@
 ** 
 ** Environment Variables: 
 	KUBE_APISERVER		k8s addr.  Example: "https://localhost:4646"
-	KUBE_TOKEN			optional k8s token for auth.
-	k8sFS_LOG			optional log file path.
-	K8SFS_CA_PEM		optional manual CA PEM for libcurl
-	K8SFS_CLIENT_CERT	optional manual client PEM (cert + key)
+	K8SFS_LOG			optional log file path.
+
+	KUBE_TOKEN			optional k8s token for auth. (Token auth)
+	K8SFS_CA_PEM		optional manual CA PEM for libcurl (Cert auth)
+	K8SFS_CLIENT_CERT	optional manual client PEM (client cert + key)
 ****************************************************************************/
 
 #define FUSE_USE_VERSION 28
@@ -40,7 +41,7 @@
 
 using namespace std;
 
-// Set logs to other options via k8sFS_LOG or default to std::cout
+// Set logs to other options via K8SFS_LOG or default to std::cout
 ostream *logs = &cout;
 
 // Protect multi-threaded mode from libcurl/libopenssl race condition.
@@ -106,8 +107,27 @@ int	k8sCURL(string url, stringstream *httpData = NULL, string request = "GET", c
 		// Beware error handling (lack).
 		if (token)
 			headers = curl_slist_append(headers, (tokenHead + token).c_str());
+		
+		// Note the ENV variable curl standardizes on has no effect sadly.
+		// TODO: Robustify ca bundle...
+		if (getenv("K8SFS_CA_PEM"))
+			curl_easy_setopt(c, CURLOPT_CAINFO, getenv("K8SFS_CA_PEM"));
+		if (getenv("K8SFS_CLIENT_CERT"))
+			curl_easy_setopt(c, CURLOPT_SSLCERT, getenv("K8SFS_CLIENT_CERT"));
+		
 		if (httpData)
 			curl_easy_setopt(c, CURLOPT_WRITEDATA, httpData);
+
+		if (data != "")
+		{
+			headers = curl_slist_append(headers, "Content-Type: application/json");
+//			headers = curl_slist_append(headers, "Accept: application/json;as=Table;g=meta.k8s.io;v=v1beta1");
+//			headers = curl_slist_append(headers, "Accept: application/json");
+			curl_easy_setopt(c, CURLOPT_POSTFIELDS, data.c_str());
+			#if DEBUG
+			*logs << GREEN << data << RESET << endl;
+			#endif 
+		}
 
 		curl_easy_setopt(c, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(c, CURLOPT_CUSTOMREQUEST, request.c_str());
@@ -115,23 +135,6 @@ int	k8sCURL(string url, stringstream *httpData = NULL, string request = "GET", c
 		curl_easy_setopt(c, CURLOPT_TIMEOUT, 1);
 		curl_easy_setopt(c, CURLOPT_FOLLOWLOCATION, 1L);
 		curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, write_callback);
-
-		// Note the ENV variable curl standardizes on has no effect sadly.
-		// TODO: Robustify ca bundle...
-		if (getenv("K8SFS_CA_PEM"))
-			curl_easy_setopt(c, CURLOPT_CAINFO, getenv("K8SFS_CA_PEM"));
-		if (getenv("K8SFS_CLIENT_CERT"))
-			curl_easy_setopt(c, CURLOPT_SSLCERT, getenv("K8SFS_CLIENT_CERT"));
-
-		if (data != "")
-		{
-			headers = curl_slist_append(headers, "Content-Type: application/json");
-			headers = curl_slist_append(headers, "Accept: application/json;as=Table;g=meta.k8s.io;v=v1beta1");
-			curl_easy_setopt(c, CURLOPT_POSTFIELDS, data.c_str());
-			#if DEBUG
-			*logs << GREEN << data << RESET << endl;
-			#endif 
-		}
 
 		curl_easy_perform(c);
 
@@ -286,10 +289,18 @@ int k8s_mkdir(const char *path, mode_t mode)
 	return k8s_write(((string)path + '/').c_str(), "", 0, 0, NULL);
 }
 
-// k8s uses a GC for dead jobs but we can delete with purge.
 int k8s_unlink(const char *path)
 {
-	return k8sCURL((string)"/api/v1" + path, NULL, "DELETE") ? -EINVAL : 0;
+	stringstream stream;
+	string rpath = getRESTbase(path) + path;
+
+	// Need to include any string in data to specify JSON
+	switch (k8sCURL(rpath, &stream, "DELETE", "{}"))
+	{
+		case 404:	return -ENOENT;
+		case 403:	return -EPERM;
+	}
+	return 0;
 }
 
 int k8s_chmod(const char *path, mode_t mode)
@@ -298,6 +309,7 @@ int k8s_chmod(const char *path, mode_t mode)
 }
 
 // Return stat of root fs (partition).
+// We need to show some space available on device to create anything new...
 int k8s_statfs(const char *path, struct statvfs *statv)
 {
 	statv->f_bsize	= 
@@ -324,7 +336,7 @@ void* k8s_init(struct fuse_conn_info *conn)
 	{
 		if (!(logs = new ofstream(getenv("KUBEFS_LOG"), ofstream::out)))
 		{
-			cerr << RED << "Unable to open log output file for writing: " << getenv("k8sFS_LOG") << endl;
+			cerr << RED << "Unable to open log output file for writing: " << getenv("K8SFS_LOG") << endl;
 			cerr << "Will revert back to std::cout" << RESET << endl;
 			logs = &cout;
 		}
