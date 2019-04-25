@@ -25,3 +25,13 @@ Demo: https://youtu.be/S_3j9Awlu-o
 Simple browseable CRUD file structure of Nomad jobs.  As this uses the REST API it requires JSON syntax instead of HCL.  You can read/copy/replace/edit Nomad jobs using the tool of your choice.
 
 Demo: https://youtu.be/THBi2ke1SlQ
+
+# TFEFS
+Terraform Enterprise organization + workspace browser, allowing access to runs, states, policies, variables, and more.
+
+Demo: [TBD]
+
+# KubernetesFS
+Kubernetes namespace browser, allowing access to all resources in K8s v1.14.  This includes, DaemonSets, Deployments, RCs, Pods, Services, and more. Experimental.
+
+Demo: https://www.youtube.com/watch?v=f5wjM-GKtLo
