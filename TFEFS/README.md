@@ -27,7 +27,7 @@ fusermount -u /mnt/tfe (or your mount path)
 
 # Browsing Terraform
 Terraform accounts can be browsed like a local filesystem.  
-
+```
 [jboero@z600 ~]$ ls /mnt/tfe/organizations/
 Claranet-DemoV2  emea-se-playground-2019  hc-solutions-engineering  JoeStack  JohnBoero
 [jboero@z600 ~]$ ls /mnt/tfe/organizations/JohnBoero/
@@ -316,4 +316,4 @@ hashihang-eks  hashihang-pods  test3  test-airplus  tfe-test
     }
   ]
 }
-
+```
