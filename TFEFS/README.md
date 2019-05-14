@@ -33,7 +33,7 @@ Claranet-DemoV2  emea-se-playground-2019  hc-solutions-engineering  JoeStack  Jo
 [jboero@z600 ~]$ ls /mnt/tfe/organizations/JohnBoero/
 policies  policy-sets  ssh-keys  workspaces
 [jboero@z600 ~]$ ls /mnt/tfe/organizations/JohnBoero/workspaces
-hashihang-eks  hashihang-pods  test3  test-airplus  tfe-test
+hashihang-eks  hashihang-pods  test3  test-customer  tfe-test
 [jboero@z600 ~]$ tree /mnt/tfe/organizations/JohnBoero/workspaces/hashihang-eks
 /mnt/tfe/organizations/JohnBoero/workspaces/hashihang-eks
 ├── applies
