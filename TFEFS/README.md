@@ -1,5 +1,5 @@
 ﻿# TFEFS
-Simple browseable CRUD dir+workspace structure of Terraform.  It's written in C++ with FUSE v28, libCurl, libJSONcpp.  Support exists for KV, SSH, TOTP, PKI, sys, Cubbyhole, and may work for others by default.
+Simple browseable CRUD dir+workspace structure of Terraform.  It's written in C++ with FUSE v28, libCurl, libJSONcpp.  Support exists for Runs, Plans, Logs, and Policies, and may work for others by default.
 
 Demo: [pending]
 
