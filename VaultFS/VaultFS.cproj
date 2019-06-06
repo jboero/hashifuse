@@ -72,8 +72,10 @@ Requires libcurl, jsoncpp</Description>
     <None Include="Makefile" />
     <None Include="README.md" />
     <None Include="Config\vaultfs-rpm.spec" />
+    <None Include="Config\Dockerfile" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
+    <Folder Include="Config\vault\" />
   </ItemGroup>
 </Project>

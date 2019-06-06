@@ -28,7 +28,7 @@
     <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
     <SourceDirectory>.</SourceDirectory>
     <ExtraCompilerArguments>-g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
-    <Commandlineparameters>-d -s -o direct_io /mnt/k8s</Commandlineparameters>
+    <Commandlineparameters>-d -s -o direct_io,max_read=131072,max_write=131072 /mnt/k8s</Commandlineparameters>
     <WarningLevel>All</WarningLevel>
     <EnvironmentVariables>
       <EnvironmentVariables>

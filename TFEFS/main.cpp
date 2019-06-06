@@ -185,6 +185,7 @@ int tfe_getattr(const char *path, struct stat *stat)
 
 	// Some dir levels are actually files.
 	if (regex_match(p, (regex)"/organizations/(.*)/workspaces/(.*)/vars")
+	||	regex_match(p, (regex)"/organizations/(.*)/workspaces/current-state-version")
 	||	regex_match(p, (regex)"/organizations/(.*)/policies/(.*)")
 	||	regex_match(p, (regex)"/organizations/(.*)/policy-sets/(.*)")
 	||  regex_match(p, (regex)"/organizations/(.*)/ssh-keys/(.*)"))
@@ -278,18 +279,11 @@ int tfe_write(const char *path, const char *buf, size_t size, off_t offset, stru
 	stringstream stream;
 	size_t mlen;
 
-	// Need to get mount type to figure out how to read this path.
-	//if (res = tfeCURLjson("/v1/sys/mounts", mount))
-	//	return -EINVAL;
-
 	if ((mlen = p.find('/')) == string::npos)
 		return -ENOTDIR;
 
-	// KV2 Need to re-wrap ourselves in data:{}
-	//payload = "{\"data\":" + payload + "}";
-	//p.insert(mlen, "/data");
-
-	if (tfeCURL(apiVers + '/' + p, stream, "POST", payload.c_str()))
+	// TODO patch vars...
+	if (tfeCURL(apiVers + '/' + p, stream, "PATCH", payload.c_str()))
 		return -EINVAL;
 
 	return size;
@@ -392,6 +386,7 @@ int tfe_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 			filler(buf, "state-versions", NULL, 0);
 			filler(buf, "vars", NULL, 0);
 			filler(buf, "runs", NULL, 0);
+			filler(buf, "current-state-version", NULL, 0);
 		}
 	}
 	else if (slashes == 5)			// /organizations/JohnBoero/workspaces/test3/{plans,etc}
