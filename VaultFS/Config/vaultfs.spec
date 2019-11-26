@@ -8,7 +8,7 @@ License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
 Requires(post): libcurl fuse jsoncpp
 BuildRequires:  gcc-c++ libcurl-devel fuse-devel
-#BuildRequires:  jsoncpp-devel
+BuildRequires:  jsoncpp-devel
 URL:            https://www.vaultproject.io/
 
 %define debug_package %{nil}
@@ -20,10 +20,6 @@ FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community pro
 %autosetup -c %{name}-%{version}
 
 %build
-env
-pwd
-ls /
-ls /*/*
 cd hashifuse-master/VaultFS
 make
 
