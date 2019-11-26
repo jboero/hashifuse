@@ -10,7 +10,7 @@ URL:            https://www.terraform.io/
 %define debug_package %{nil}
 
 %description
-FUSE filesystem for browsing and managing Hashicorp Terraform Enterprise.
+FUSE filesystem for browsing and managing Hashicorp Terraform Enterprise / Terraform Cloud. Community project not supported by Hashicorp.
 
 %prep
 %autosetup -c %{name}-%{version}
