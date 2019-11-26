@@ -10,7 +10,7 @@ URL:            https://www.consul.io/
 %define debug_package %{nil}
 
 %description
-FUSE filesystem for browsing and managing Kubernetes resources as files.
+FUSE filesystem for browsing and managing Consul resources as files. Community project not supported by Hashicorp.
 
 %prep
 %autosetup -c %{name}-%{version}
