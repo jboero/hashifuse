@@ -19,13 +19,14 @@ Demo: [TBD]
 # VaultFS
 Simple browseable CRUD dir+secret structure of Vault KV secrets.  Operations for other engines is undefined, but may work with correct directory structure.  There is nothing to stop you doing a generic read of PKI, SSH, DB secrets etc.
 
-Demo:
+Demo Video:
 [![IMAGE ALT TEXT](http://i3.ytimg.com/vi/S_3j9Awlu-o/maxresdefault.jpg)](https://youtu.be/S_3j9Awlu-o)
 
 # NomadFS
 Simple browseable CRUD file structure of Nomad jobs.  As this uses the REST API it requires JSON syntax instead of HCL.  You can read/copy/replace/edit Nomad jobs using the tool of your choice.
 
-Demo: https://youtu.be/THBi2ke1SlQ
+Demo Video:
+[![IMAGE ALT TEXT](http://i3.ytimg.com/vi/THBi2ke1SlQ/maxresdefault.jpg)](https://youtu.be/THBi2ke1SlQ)
 
 # TFEFS
 Terraform Enterprise organization + workspace browser, allowing access to runs, states, policies, variables, and more.
@@ -35,4 +36,5 @@ Demo: [TBD]
 # KubernetesFS
 Kubernetes namespace browser, allowing access to all resources in K8s v1.14.  This includes, DaemonSets, Deployments, RCs, Pods, Services, and more. Experimental.
 
-Demo: https://www.youtube.com/watch?v=f5wjM-GKtLo
+Demo Video:
+[![IMAGE ALT TEXT](http://i3.ytimg.com/vi/f5wjM-GKtLo/maxresdefault.jpg)](https://youtu.be/f5wjM-GKtLo)
