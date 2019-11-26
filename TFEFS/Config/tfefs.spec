@@ -5,6 +5,7 @@ Summary:        Hashicorp Terraform Enterprise Fuse Agent
 License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
 Requires:       libcurl fuse jsoncpp
+BuildRequires:  gcc-c++
 URL:            https://www.terraform.io/
 
 %define debug_package %{nil}
