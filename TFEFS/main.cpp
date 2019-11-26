@@ -10,7 +10,7 @@
 ** Note direct_io is mandatory right now until we can get key size in getattrs.
 ** Environment Variables: 
 	TFE_ADDR		tfe address, or app.terraform.io by default (SaaS)  Example: "http://localhost:8200"
-	ATLAS_TOKEN		bearer token.
+	TFE_TOKEN		bearer token.
 
 ** This code is kept fairly simple/ugly without object oriented best practices.
 ** TODO: securely destroy strings - https://stackoverflow.com/questions/5698002/how-does-one-securely-clear-stdstring
@@ -86,7 +86,7 @@ int	tfeCURL(string url, stringstream &httpData, string request = "GET", const st
 	int res = 0, httpCode = 0;
 	const char *nsHeader = "Content-Type: application/vnd.api+json";
 	string tokenHeader = "Authorization: Bearer ";
-	struct curl_slist *headers = curl_slist_append(NULL, (tokenHeader + getenv("ATLAS_TOKEN")).c_str());
+	struct curl_slist *headers = curl_slist_append(NULL, (tokenHeader + getenv("TFE_TOKEN")).c_str());
 	headers = curl_slist_append(headers, nsHeader);
 	CURL* curl;
 
