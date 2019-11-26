@@ -21,8 +21,9 @@ FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community pro
 
 %build
 env
+pwd
 ls /
-ls */*
+ls /*/*
 cd hashifuse-master/VaultFS
 make
 
