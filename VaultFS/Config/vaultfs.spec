@@ -18,7 +18,6 @@ FUSE filesystem for browsing and managing Hashicorp Vault secrets.
 %autosetup -c %{name}-%{version}
 
 %build
-tree
 cd hashifuse-master/VaultFS
 make
 
