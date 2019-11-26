@@ -19,7 +19,8 @@ Demo: [TBD]
 # VaultFS
 Simple browseable CRUD dir+secret structure of Vault KV secrets.  Operations for other engines is undefined, but may work with correct directory structure.  There is nothing to stop you doing a generic read of PKI, SSH, DB secrets etc.
 
-Demo: https://youtu.be/S_3j9Awlu-o
+Demo:
+[![IMAGE ALT TEXT](http://i3.ytimg.com/vi/S_3j9Awlu-o/maxresdefault.jpg)](https://youtu.be/S_3j9Awlu-o)
 
 # NomadFS
 Simple browseable CRUD file structure of Nomad jobs.  As this uses the REST API it requires JSON syntax instead of HCL.  You can read/copy/replace/edit Nomad jobs using the tool of your choice.
