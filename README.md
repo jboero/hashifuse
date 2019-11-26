@@ -34,7 +34,7 @@ Terraform Enterprise organization + workspace browser, allowing access to runs, 
 Demo: [TBD]
 
 # KubernetesFS
-Kubernetes namespace browser, allowing access to all resources in K8s v1.14.  This includes, DaemonSets, Deployments, RCs, Pods, Services, and more. Experimental.
+Kubernetes namespace browser, allowing access to all resources in K8s v1.14.  This includes, DaemonSets, Deployments, RCs, Pods, Services, and more. Experimental.  Works with OpenShift too.  Versions subject to unknown compatibility.
 
 Demo Video:
 [![IMAGE ALT TEXT](http://i3.ytimg.com/vi/f5wjM-GKtLo/maxresdefault.jpg)](https://youtu.be/f5wjM-GKtLo)
