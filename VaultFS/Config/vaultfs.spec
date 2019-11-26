@@ -20,7 +20,7 @@ FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community pro
 %autosetup -c %{name}-%{version}
 
 %build
-yum repolist
+/usr/bin/yum repolist
 cd hashifuse-master/VaultFS
 make
 
