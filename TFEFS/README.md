@@ -4,11 +4,11 @@ Simple browseable CRUD dir+workspace structure of Terraform.  It's written in C+
 Demo: [pending]
 
 # Running TFEFS
-Assuming you have a TFE account (SaaS or private on-prem), simply set TFE_ADDR (or leave blank for SaaS) and ATLAS_TOKEN, just like you would for API calls.
+Assuming you have a TFE account (SaaS or private on-prem), simply set TFE_ADDR (or leave blank for SaaS) and TFE_TOKEN, just like you would for API calls.
 
 ```
 $ export TFE_ADDR=http://localhost:8200
-$ export ATLAS_TOKEN=[YOUR TOKEN]
+$ export TFE_TOKEN=[YOUR TOKEN]
 $ ./tfefs -s -o direct_io /mnt/tfe (or your mount path)
 ```
 
