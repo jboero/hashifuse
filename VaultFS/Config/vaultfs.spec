@@ -2,7 +2,7 @@
 
 Name:           vaultfs
 Version:        0.1
-Release:        1%{?dist}
+Release:        1
 Summary:        Hashicorp VaultFS Fuse Agent
 License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
