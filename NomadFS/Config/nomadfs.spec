@@ -5,7 +5,7 @@ Summary:        Hashicorp Consul FUSE Agent
 License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
 Requires(post): libcurl fuse jsoncpp
-BuildRequires:  gcc-c++
+BuildRequires:  gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
 URL:            https://www.consul.io/
 
 %define debug_package %{nil}
