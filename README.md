@@ -31,7 +31,8 @@ Demo Video:
 # TFEFS
 Terraform Enterprise organization + workspace browser, allowing access to runs, states, policies, variables, and more.
 
-Demo: [TBD]
+Demo:
+![TFEFS Demo Webp](tfefs.webp)
 
 # KubernetesFS
 Kubernetes namespace browser, allowing access to all resources in K8s v1.14.  This includes, DaemonSets, Deployments, RCs, Pods, Services, and more. Experimental.  Works with OpenShift too.  Versions subject to unknown compatibility.
