@@ -17,7 +17,7 @@ Simple browseable CRUD dir+file structure on KV storage.  Changes are made direc
 Demo: [TBD]
 
 # VaultFS
-Simple browseable CRUD dir+secret structure of Vault KV secrets.  Operations for other engines is undefined, but may work with correct directory structure.  There is nothing to stop you doing a generic read of PKI, SSH, DB secrets etc.
+Simple browseable CRUD dir+secret structure of Vault secrets.
 
 Demo Video:
 [![IMAGE ALT TEXT](http://i3.ytimg.com/vi/S_3j9Awlu-o/maxresdefault.jpg)](https://youtu.be/S_3j9Awlu-o)
