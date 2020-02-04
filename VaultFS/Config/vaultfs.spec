@@ -8,6 +8,7 @@ Requires(post): libcurl fuse jsoncpp
 BuildRequires:  gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
 URL:            https://www.vaultproject.io/
 
+%global debug_package %{nil}
 %define debug_package %{nil}
 
 %description
