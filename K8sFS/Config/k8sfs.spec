@@ -8,8 +8,6 @@ Requires(post): libcurl fuse jsoncpp
 BuildRequires:  gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
 URL:            https://github.com/jboero/hashifuse
 
-%define debug_package %{nil}
-
 %description
 FUSE filesystem for browsing and managing Kubernetes resources as files. Community project not supported by Hashicorp.
 
@@ -18,7 +16,7 @@ FUSE filesystem for browsing and managing Kubernetes resources as files. Communi
 
 %build
 cd hashifuse-master/K8sFS
-make
+g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -O3 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
 
 %install
 
