@@ -12,7 +12,7 @@ URL:            https://www.vaultproject.io/
 %description
 FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community project not supported by Hashicorp.
 
-%global debug_package %{nil}
+%define debug_package %{nil}
 
 %prep
 %autosetup -c %{name}-%{version}
