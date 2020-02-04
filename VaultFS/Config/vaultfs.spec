@@ -8,17 +8,17 @@ Requires(post): libcurl fuse jsoncpp
 BuildRequires:  gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
 URL:            https://www.vaultproject.io/
 
-%global debug_package vaultfs-debug
-
 %description 
 FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community project not supported by Hashicorp.
 
 %prep
+#%%debug_package
+
 %autosetup -c %{name}-%{version}
 
 %build
 cd hashifuse-master/VaultFS
-g++ -o vault $CFLAGS -D_FILE_OFFSET_BITS=64 -O3 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
+g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -O3 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
 
 %install
 mkdir -p %{buildroot}%{_bindir}
