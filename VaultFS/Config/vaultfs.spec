@@ -21,8 +21,7 @@ cd hashifuse-master/VaultFS
 make
 
 %install
-
-mkdir -p %{buildroot}%{_bindir}/
+mkdir -p %{buildroot}%{_bindir}
 cp -p hashifuse-master/VaultFS/%{name} %{buildroot}%{_bindir}/
 
 %clean
