@@ -5,7 +5,7 @@ Summary:        Hashicorp Kubernetes Fuse Agent
 License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
 Requires(post): libcurl fuse jsoncpp
-BuildRequires:  yum-plugin-fastestmirror gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
+BuildRequires:  gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
 URL:            https://github.com/jboero/hashifuse
 
 %define debug_package %{nil}
