@@ -35,22 +35,5 @@ rm -rf %{_builddir}/*
 %files
 %{_bindir}/%{name}
 
-%pre
-getent group %{name} > /dev/null || groupadd -r %{name}
-getent passwd %{name} > /dev/null || \
-    useradd -r -d %{_sharedstatedir}/%{name} -g %{name} \
-    -s /sbin/nologin -c "Hashicorp vaultfs job scheduler" %{name}
-exit 0
-
-%post
-%systemd_post %{name}.service
-/sbin/setcap cap_ipc_lock=+ep %{_bindir}/%{name}
-
-%preun
-%systemd_preun %{name}.service
-
-%postun
-%systemd_postun_with_restart %{name}.service
-
 %changelog
 
