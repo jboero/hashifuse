@@ -8,9 +8,6 @@ Requires(post): libcurl fuse jsoncpp
 BuildRequires:  yum-plugin-fastestmirror gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
 URL:            https://github.com/jboero/hashifuse
 
-%global debug_package %{nil}
-%define debug_package %{nil}
-
 %description
 FUSE filesystem for browsing and managing Kubernetes resources as files. Community project not supported by Hashicorp.
 
