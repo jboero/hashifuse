@@ -8,11 +8,10 @@ Requires(post): libcurl fuse jsoncpp
 BuildRequires:  gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
 URL:            https://www.vaultproject.io/
 
-
-%description
-FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community project not supported by Hashicorp.
-
 %define debug_package %{nil}
+
+%description 
+FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community project not supported by Hashicorp.
 
 %prep
 %autosetup -c %{name}-%{version}
