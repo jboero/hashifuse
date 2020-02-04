@@ -16,7 +16,7 @@ FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community pro
 
 %build
 cd hashifuse-master/VaultFS
-make
+g++ -o vault $CFLAGS -D_FILE_OFFSET_BITS=64 -O3 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
 
 %install
 mkdir -p %{buildroot}%{_bindir}
