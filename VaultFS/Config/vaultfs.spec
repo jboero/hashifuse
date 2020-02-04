@@ -12,7 +12,6 @@ URL:            https://www.vaultproject.io/
 FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community project not supported by Hashicorp.
 
 %prep
-#%%debug_package
 
 %autosetup -c %{name}-%{version}
 
