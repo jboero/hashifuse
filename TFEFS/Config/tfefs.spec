@@ -8,8 +8,6 @@ Requires:       libcurl fuse jsoncpp
 BuildRequires:  gcc-c++ libcurl-devel fuse-devel jsoncpp-devel
 URL:            https://www.terraform.io/
 
-%define debug_package %{nil}
-
 %description
 FUSE filesystem for browsing and managing Hashicorp Terraform Enterprise / Terraform Cloud. Community project not supported by Hashicorp.
 
@@ -18,7 +16,7 @@ FUSE filesystem for browsing and managing Hashicorp Terraform Enterprise / Terra
 
 %build
 cd hashifuse-master/TFEFS
-make
+g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -O3 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
 
 %install
 
