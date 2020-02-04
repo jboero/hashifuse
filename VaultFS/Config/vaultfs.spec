@@ -1,5 +1,3 @@
-# https://fedoraproject.org/wiki/How_to_create_an_RPM_package
-
 Name:           vaultfs
 Version:        0.1
 Release:        1
