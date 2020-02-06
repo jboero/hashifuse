@@ -1,6 +1,6 @@
 Name:           vaultfs
 Version:        0.1
-Release:        3
+Release:        4
 Summary:        Hashicorp VaultFS Fuse Agent
 License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
@@ -17,7 +17,7 @@ FUSE filesystem for browsing and managing Hashicorp Vault secrets. Community pro
 
 %build
 cd hashifuse-master/VaultFS
-g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -O3 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
+g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
 
 %install
 mkdir -p %{buildroot}%{_bindir}
