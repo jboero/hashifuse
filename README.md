@@ -6,6 +6,8 @@ By mapping a REST endpoints to a filesystem, complex Vault secrets, Consul KV va
 # Building
 I'm not a full-time dev these days but I used to write FUSE filesystems quite a bit.  My choices of language and IDE are clearly dated, but MonoDevelop 5.9 was always a good IDE for me to debug multithreaded C++ FUSE apps, and git integration helps you check out directly from the IDE even if it's ancient.  Anyone who would like to port these to a different language is more than welcome.
 
+WARNING don't build with optimization flags (-O2, -O3, etc.) as it will result in segfaults.  I just spent hours with strace and wondering why I got segfaults and /dev/fuse permission denial.  Turns out everything works fine just without optimization.  Frustrating.
+
 _Dependencies for all three: libFUSE, libCurl, libjsoncpp_
 
 # Thoughts on FUSE
