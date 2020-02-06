@@ -1,6 +1,6 @@
 Name:           consulfs
 Version:        0.1
-Release:        1
+Release:        2
 Summary:        Hashicorp Kubernetes Fuse Agent
 License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
@@ -16,7 +16,7 @@ FUSE filesystem for browsing and managing Consul resources as files. Community p
 
 %build
 cd hashifuse-master/ConsulFS
-g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -O3 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
+g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
 
 %install
 
