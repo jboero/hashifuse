@@ -16,7 +16,7 @@ FUSE filesystem for browsing and managing Nomad resources as files. Community pr
 
 %build
 cd hashifuse-master/NomadFS
-g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -O3 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
+g++ -g -o %{name} $CFLAGS -D_FILE_OFFSET_BITS=64 -std=c++11 -lfuse -ljsoncpp -lcurl main.cpp
 
 %install
 
