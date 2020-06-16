@@ -1,5 +1,5 @@
 # Why HashiFUSE?
-Experimental FUSE clients for Hashicorp REST APIs.  These make it simple to adopt Hashicorp products by mapping basic REST API functions to FUSE filesystems.  Note they are beta PoC.  Do not use them for any production clusters.
+Experimental FUSE clients for Hashicorp REST APIs.  These make it simple to adopt Hashicorp products by mapping basic REST API functions to FUSE filesystems.  Note they are beta PoC.  Do not use them for any production clusters.  This is not my prettiest code but it tends to work fairly well.
 
 By mapping a REST endpoints to a filesystem, complex Vault secrets, Consul KV values, and Nomad jobs can be created, read, updated, deleted, and browsed (CRUD... B).  This can all be done with your existing tools, scripts, rsyncs, GUI+drag and drop, all without worrying about fat-fingering a REST call.
 
