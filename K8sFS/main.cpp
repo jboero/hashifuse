@@ -36,6 +36,7 @@
 #include <fstream>
 #include <mutex>
 #include <regex>
+#include <exception>
 
 #include <fuse.h>
 
@@ -55,6 +56,9 @@ const char CYAN[]	= "\e[1;36m";
 const char PURPLE[]	= "\e[0;35m";
 const char GREEN[]	= "\e[0;32m";
 const char BLUE[]	= "\e[0;34m";
+
+// Keep a global set of placeholder files we've created locally.
+set<string> createds;
 
 // CURL callback
 namespace
@@ -183,6 +187,11 @@ int k8s_getattr(const char *path, struct stat *stat)
 	string p(path), key;
 	size_t depth = count(p.begin(), p.end(), '/');
 
+	// Remove optional ".json" suffix we added in readdir
+	size_t suffix = p.find(".json");
+	if (suffix != string::npos)
+		p.erase(suffix, 5);
+
 	stat->st_uid = getuid();
 	stat->st_gid = getgid();
 	stat->st_blocks = 
@@ -211,6 +220,15 @@ int k8s_read(const char *path, char *buf, size_t size, off_t offset, struct fuse
 	string data, p(path);
 	stringstream sstream;
 
+	// Is this a placeholder we've created locally?
+	if (createds.find(path) != createds.end())
+		return 0;
+	
+	// Remove optional ".json" suffix we added in readdir
+	size_t suffix = p.find(".json");
+	if (suffix != string::npos)
+		p.erase(suffix, 5);
+
 	// TODO adapt this for different types
 	if (k8sCURL(getRESTbase(p) + p + "?pretty=true", &sstream))
 		return -ENOENT;
@@ -230,6 +248,11 @@ int k8s_write(const char *path, const char *buf, size_t size, off_t offset, stru
 	string p(path), rest(getRESTbase(path));
 	int httpCode;
 
+	// Remove optional ".json" suffix we added in readdir
+	size_t suffix = p.find(".json");
+	if (suffix != string::npos)
+		p.erase(suffix, 5);
+	
 	if ((httpCode = k8sCURL(rest + p, &sstream, "PUT", buf)))
 	{
 		// 400 means we'll need to create this.
@@ -239,6 +262,11 @@ int k8s_write(const char *path, const char *buf, size_t size, off_t offset, stru
 		if (k8sCURL(rest + p, &sstream, "POST", buf))
 			return -EINVAL;
 	}
+
+	// Remove placeholder if we successfully wrote it to API
+	if (createds.find(path) != createds.end())
+		createds.erase(path);
+	
 	return size;
 }
 
@@ -271,6 +299,9 @@ int k8s_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 	for (Json::Value::const_iterator itr = result.begin() ; itr != result.end() ; itr++ )
 	{
 		string name = (*itr)["metadata"]["name"].asString();
+		if (depth > 1)
+			name += ".json";
+
 		filler(buf, name.c_str(), NULL, 0);
 	}
 
@@ -317,7 +348,7 @@ int k8s_statfs(const char *path, struct statvfs *statv)
 	statv->f_blocks	= 
 	statv->f_bfree	= 
 	statv->f_bavail	= 32768;
-	statv->f_files	= 15;
+	statv->f_files	= 
 	statv->f_bfree	= 15;
 	statv->f_favail	= 10000;
 	statv->f_fsid	= 100;
@@ -354,6 +385,42 @@ void k8s_destroy(void* private_data)
 	curl_global_cleanup();
 }
 
+// Create must add a placeholder so we can get gettatr and read (0).
+int k8s_create(const char *path, mode_t mode, struct fuse_file_info *fi)
+{
+	// Use a local placeholder.
+	createds.insert(path);
+	return 0;
+}
+
+
+// Token renewal background thread.
+void *renew_token (void *ignored)
+{
+	int delay;
+
+	try
+	{
+		delay = atoi(getenv("KUBE_RENEW_TTL"));
+	}
+	catch (exception &e)
+	{
+		cerr << "Can't get KUBE_RENEW_TTL, defaulting to 60 seconds." << endl;
+		delay = 60;
+	}
+	
+	while (true)
+	{
+		// Examples: 
+		// export KUBE_TOKEN=$(/usr/lib64/google-cloud-sdk/bin/gcloud 
+		//	config config-helper --format=json | jq -r .credential.access_token)
+
+		// vault lease renew [my-k8s-lease-id]
+		//system(getenv("KUBE_RENEW_TOKEN"));
+		sleep (delay);
+	}
+}
+
 // Set up function pointers and return a fuse_operations struct.
 int main(int argc, char *argv[])
 {
@@ -370,10 +437,18 @@ int main(int argc, char *argv[])
 		.readdir = k8s_readdir,
 		.init = k8s_init,
 		.destroy = k8s_destroy,
+		.create = k8s_create
 	};
 
 	if ((getuid() == 0) || (geteuid() == 0))
 		cerr << YELLOW << "WARNING Running a FUSE filesystem as root opens security holes" << endl;
 	
+	pthread_t renewer;
+	if (getenv("KUBE_RENEW_TOKEN"))
+	{
+		pthread_create(&renewer, NULL, renew_token, NULL);
+		pthread_detach(renewer);
+	}
+
 	return fuse_main(argc, argv, &fuse, NULL);
 }

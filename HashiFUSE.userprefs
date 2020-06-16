@@ -1,12 +1,14 @@
-﻿<Properties StartupItem="TFEFS/TFEFS.cproj">
+﻿<Properties StartupItem="TFEFS/TFEFS.cproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="NomadFS/main.cpp">
+  <MonoDevelop.Ide.Workbench ActiveDocument="TFEFS/main.cpp">
     <Files>
-      <File FileName="NomadFS/main.cpp" Line="26" Column="23" />
+      <File FileName="TFEFS/main.cpp" Line="208" Column="56" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/jboero/code/hashifuse/test/main.c" line="19" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

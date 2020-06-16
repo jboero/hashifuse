@@ -9,8 +9,9 @@
 ** Note single threaded mode is currently mandatory for tfefs (-s flag)
 ** Note direct_io is mandatory right now until we can get key size in getattrs.
 ** Environment Variables: 
-	TFE_ADDR		tfe address, or app.terraform.io by default (SaaS)  Example: "http://localhost:8200"
-	ATLAS_TOKEN		bearer token.
+	TFE_ADDR			tfe address, or app.terraform.io by default (SaaS)  Example: "http://localhost:8200"
+	TFE_TOKEN			bearer token.
+	TFE_CACHE_EXPIRE	Seconds of inactivity before we flush all cache.  Default 300s.
 
 ** This code is kept fairly simple/ugly without object oriented best practices.
 ** TODO: securely destroy strings - https://stackoverflow.com/questions/5698002/how-does-one-securely-clear-stdstring
@@ -59,6 +60,13 @@ ostream *logs = &cout;
 // Protect multi-threaded mode from libcurl/libopenssl race condition.
 mutex curlmutex;
 
+// Added v0.2 JUN-2020
+// Global cache locally since libCurl doesn't support it.
+// We'll just purge this every few seconds for simplicity.
+map<string, string> cache;
+time_t cache_timestamp = time(NULL);
+int cache_expiration = 300;
+
 // CURL callback
 namespace
 {
@@ -84,27 +92,39 @@ namespace
 int	tfeCURL(string url, stringstream &httpData, string request = "GET", const string post = "")
 {
 	int res = 0, httpCode = 0;
-	const char *nsHeader = "Content-Type: application/vnd.api+json";
 	string tokenHeader = "Authorization: Bearer ";
-	struct curl_slist *headers = curl_slist_append(NULL, (tokenHeader + getenv("ATLAS_TOKEN")).c_str());
-	headers = curl_slist_append(headers, nsHeader);
-	CURL* curl;
+	struct curl_slist *headers = curl_slist_append(NULL, (tokenHeader + getenv("TFE_TOKEN")).c_str());
+	headers = curl_slist_append(headers, "Content-Type: application/vnd.api+json");
+	static CURL* curl = curl_easy_init();
 
 	if (getenv("TFE_ADDR"))
 		url = (string)getenv("TFE_ADDR") + url;
 	else
 		url = "https://app.terraform.io" + url;
 	
+	// 
+	if (time(NULL) - cache_timestamp > 300)
+		cache.clear();
+	try
+	{
+		string val = cache.at(url);
+		httpData << val;
+		cout << GREEN << "Using cache for " << url << RESET << endl;
+		return 0;
+	}
+	catch (exception e)
+	{
+	}
+
 	#if DEBUG
 	*logs << CYAN << url << RESET << endl;
 	#endif
 
 	{
 		lock_guard<mutex> lk(curlmutex);
-	
-		if (!(curl = curl_easy_init()))
+		if (!curl)
 			return -1;
-		
+
 		if (res = curl_easy_setopt(curl, CURLOPT_URL, url.c_str()))
 			return res;
 
@@ -139,16 +159,21 @@ int	tfeCURL(string url, stringstream &httpData, string request = "GET", const st
 
 		curl_easy_perform(curl);
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-		curl_easy_cleanup(curl);
 		curl_slist_free_all(headers);
+		cache[url] = httpData.str();
+		cout << GREEN << "Cache size is " << cache.size() << RESET << endl;
 	}
 
 	if (httpCode < 200 || httpCode >= 300)
 	{
-		*logs << "Couldn't " << request << " " << post << " -> " << url << " HTTP" << httpCode << endl;
+		*logs << RED 
+			<< "Couldn't " << request << " " << post << " -> " 
+			<< url << " HTTP" << httpCode 
+			<< RESET << endl;
 		return httpCode;
 	}
 
+	cache_timestamp = time(NULL) + cache_expiration;
 	return res;
 }
 
@@ -161,7 +186,14 @@ int	tfeCURLjson(string url, Json::Value &jsonData, string request = "GET", strin
 	if (res = tfeCURL(url, stream, request, post))
 		return res;
 
-	stream >> jsonData;
+	try
+	{
+		stream >> jsonData;
+	}
+	catch (exception e)
+	{
+		cerr <<YELLOW<< "WARNING JSON problem.  Possibly data is too large for maxread: " << e.what() <<RESET<<endl;
+	}
 
 	return 0;
 }
@@ -407,7 +439,7 @@ int tfe_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 		getline(sp, ws, '/');		// test3
 
 		endpoint = apiVers + '/' + endpoint + "?filter[organization][name]=" + org 
-			+ "&filter[workspace][name]=" + ws;
+			+ "&filter[workspace][name]=" + ws + "&page[size]=100";
 
 		tfeCURLjson(endpoint, keys);
 		fillArray(keys["data"], buf, filler);
@@ -416,10 +448,30 @@ int tfe_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 	return 0;
 }
 
+static void my_lock(CURL *handle, curl_lock_data data,
+                    curl_lock_access laccess, void *useptr)
+{
+  (void)handle;
+  (void)data;
+  (void)laccess;
+  (void)useptr;
+}
+ 
+static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
+{
+  (void)handle;
+  (void)data;
+  (void)useptr;
+}
+
 void* tfe_init(struct fuse_conn_info *conn)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 	conn->want |= FUSE_CAP_BIG_WRITES;
+
+	// Did we specify cache expiration seconds?
+	if (getenv("TFE_CACHE_EXPIRE"))
+		cache_expiration = atoi(getenv("TFE_CACHE_EXPIRE"));
 
 	return NULL;
 }

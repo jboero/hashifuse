@@ -157,8 +157,7 @@ int nomad_getattr(const char *path, struct stat *stat)
 
 	// Be careful with timestamp - file will always appear modified on disk.
 	// If using rsync, disable timestamp comparisons.
-	//stat->st_atime = stat->st_mtime = stat->st_ctime = time(NULL);
-	stat->st_atime = stat->st_mtime = stat->st_ctime = 0;
+	stat->st_atime = stat->st_mtime = stat->st_ctime = time(NULL);
 
 	// For now we just support jobs endpoint.
 	if (p == "/" || p == "/job")
@@ -190,9 +189,13 @@ int nomad_read(const char *path, char *buf, size_t size, off_t offset, struct fu
 	string data, p(path);
 	stringstream sstream;
 
+	// If we're a new file - just read 0.
+	if (createds.find(path) != createds.end())
+		return 0;
+	
 	// Chop off pseudo ".json" we added.
 	p = p.substr(0, p.length() - 5);
-	if (nomadCURL(apiVers + p.substr(), sstream))
+	if (nomadCURL(apiVers + p.substr() + "?pretty", sstream))
 		return -ENOENT;
 
 	data = sstream.str();
@@ -207,11 +210,16 @@ int nomad_read(const char *path, char *buf, size_t size, off_t offset, struct fu
 int nomad_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
 	stringstream stream;
-	string jobspec = (string) "{\"Job\":" + buf + "}";
+	char *tmp = new char[size + 1];
+
+	// Ugly and shameful but it's const and I'm mixing languages.
+	memcpy(tmp, buf, size);
+	string jobspec = (string) "{\"Job\":" + tmp + "}";
+	delete [] tmp;
 
 	if (nomadCURL(apiVers + "/jobs", stream, "POST", jobspec.c_str()))
 		return -EINVAL;
-
+	
 	if (createds.find(path) != createds.end())
 		createds.erase(path);
 	return size;

@@ -27,7 +27,7 @@
     <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
     <SourceDirectory>.</SourceDirectory>
     <ExtraCompilerArguments>-g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
-    <Commandlineparameters>-d -s -o direct_io /mnt/nomad</Commandlineparameters>
+    <Commandlineparameters>-s -f -o direct_io /mnt/nomad</Commandlineparameters>
     <WarningLevel>All</WarningLevel>
     <EnvironmentVariables>
       <EnvironmentVariables>

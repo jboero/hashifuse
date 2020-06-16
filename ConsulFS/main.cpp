@@ -80,15 +80,14 @@ int	consulCURL(string url, stringstream &httpData, string request = "GET", const
 {
 	int httpCode = 0;
 	static const string tokenHead = "X-Consul-Token: ";
-	string https = "";
+	string addr = "http://localhost:8500";
 	struct curl_slist *headers = NULL;
 	CURL* curl;
 
-	// Note case sensitivity.  Must be "true" lower for effect, or set https in CONSUL_HTTP_ADDR.
-	if ((string)getenv("CONSUL_HTTP_SSL") == "true")
-		https = "https://";
+	if (getenv("CONSUL_HTTP_ADDR"))
+		addr = getenv("CONSUL_HTTP_ADDR");
 	
-	url = https + getenv("CONSUL_HTTP_ADDR") + url;	// + dc;
+	url = addr + url;	// + dc;
 
 	#if DEBUG
 	*logs << CYAN << url << RESET << endl;
@@ -246,27 +245,50 @@ int consul_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t of
 {
 	Json::Value keys;
 	string p(path), f;
-	set<string> names;
 
+	set<string> names;
+	size_t depth = count(p.begin(), p.end(), '/');
+
+	stringstream sp(p);
+	string ignore, dc, l1, l2;
+	getline(sp, ignore, '/');	// /
+	getline(sp, dc, '/');		// dc1
+	getline(sp, l1, '/');		// nodes,catalog,kv,etc
+	getline(sp, l2, '/');		// leaf
+
+	regex_search(p.begin(), p.end(), matches, (regex)".*/.*");
 	if (p == "/")
 	{
-		if (consulCURLjson(apiVers + p + "/catalog/datacenters", keys))
+		if (consulCURLjson(apiVers + p + "catalog/datacenters", keys))
 			return -ENOENT;
-		
-		filler(buf, "health", NULL, 0);
-
-
+	}
+	else if (depth == 2)
+	{
+		filler(buf, "nodes", NULL, 0);
+		filler(buf, "kv", NULL, 0);
+		filler(buf, "catalog", NULL, 0);
+		filler(buf, "acl", NULL, 0);
+		filler(buf, "connect", NULL, 0);
 		return 0;
 	}
-
+	else if (depth == 3)
+	{
+		if 
+		filler(buf, "nodes", NULL, 0);
+		filler(buf, "kv", NULL, 0);
+		filler(buf, "catalog", NULL, 0);
+		filler(buf, "acl", NULL, 0);
+		filler(buf, "connect", NULL, 0);
+		return 0;
+	}
 	// Need separator to not recurse
-	if (consulCURLjson(apiVers + p + "/?keys=true&separator=/", keys))
+	else if (consulCURLjson(apiVers + p + "/?keys=true&separator=/", keys))
 		return -ENOENT;
 
 	// Chop off "/kv/" or "/kv" (annoyingly we need both).
-	p = p.substr(3);
-	if (p.length() > 0 && p[0] == '/')
-		p = p.substr(1);
+	//p = p.substr(3);
+	//if (p.length() > 0 && p[0] == '/')
+	//	p = p.substr(1);
 	
 	// Use a set to eliminate duplicates.
 	// Ugly but unfortunately Consul API keys=true implies recursive.
@@ -326,7 +348,7 @@ int consul_rmdir(const char *path)
 // Init curl subsystem and set up log stream.
 void* consul_init(struct fuse_conn_info *conn)
 {
-	curl_global_init(CURL_GLOBAL_ALL);
+ 	curl_global_init(CURL_GLOBAL_ALL);
 
 	// Set CONSULFS_LOGS env var to log destination if necessary.
 	// Default to cout, which is ignored without -d or -f arg.

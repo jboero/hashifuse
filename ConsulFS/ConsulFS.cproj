@@ -29,15 +29,16 @@
     <ExtraCompilerArguments>-g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="CONSUL_HTTP_ADDR" value="localhost:8500" />
+        <Variable name="CONSUL_HTTP_ADDR" value="https://demo.consul.io" />
         <Variable name="CONSUL_HTTP_TOKEN" value="" />
         <Variable name="CONSUL_HTTP_AUTH" value="" />
-        <Variable name="CONSUL_HTTP_SSL" value="false" />
+        <Variable name="CONSUL_HTTP_SSL" value="true" />
       </EnvironmentVariables>
     </EnvironmentVariables>
     <Commandlineparameters>-d -s -o direct_io /mnt/consul</Commandlineparameters>
     <WarningLevel>All</WarningLevel>
     <OptimizationLevel>3</OptimizationLevel>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release</OutputPath>

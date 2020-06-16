@@ -21,6 +21,8 @@
     <Description>Experimental build of TFE FUSE client in C++.  A horrible mutant combination of C++98/11 plus C.
 
 Requires libcurl, jsoncpp</Description>
+    <ReleaseVersion>0.2</ReleaseVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,17 +32,17 @@ Requires libcurl, jsoncpp</Description>
     <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
     <SourceDirectory>.</SourceDirectory>
     <ExtraCompilerArguments>-g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
-    <Commandlineparameters>-d -s -o direct_io /mnt/tfe</Commandlineparameters>
+    <Commandlineparameters>-d -s -f -o direct_io,max_write=1048576,max_read=1048576 /mnt/tfe</Commandlineparameters>
     <ExtraLinkerArguments>-lfuse</ExtraLinkerArguments>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="ATLAS_TOKEN" value="PYH78vBYf713tg.atlasv1.39VCyOdnL31m0o0BHP9baBgoBPM9muf7GUWQtSe8zj7DOxEWt69lYWou8AogUrr8f0E" />
+        <Variable name="TFE_TOKEN" value="L0J428cdpE2vVg.atlasv1.u8DHpYW0owLxdCDpbSCzh7AaOFzJyIFgqxZwy8yKnIbTzHulkWQBDsKQJSU4ejBowKE" />
         <Variable name="no_proxy" value="localhost" />
         <Variable name="http_proxy" value="" />
         <Variable name="https_proxy" value="" />
       </EnvironmentVariables>
     </EnvironmentVariables>
-    <ConsolePause>false</ConsolePause>
+    <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release</OutputPath>

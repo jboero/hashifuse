@@ -32,10 +32,11 @@
     <WarningLevel>All</WarningLevel>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="KUBE_APISERVER" value="https://kubernetes:6443" />
-        <Variable name="KUBE_TOKEN" value="XXXX" />
-        <Variable name="K8SFS_CA_PEM" value="/home/jboero/k8s.ca" />
-        <Variable name="K8SFS_CLIENT_CERT" value="/home/jboero/k8s.pem" />
+        <Variable name="KUBE_APISERVER" value="https://34.90.92.242" />
+        <Variable name="KUBE_TOKEN" value="ya29.a0AfH6SMCt1CG-c0wHOswVMK9UDYOvH6IPwUo_34dQ668iOCRi8OvhGHgTIWnyE1mD9g8kJ3XgJEBlLsYNy-gUTW9yTuVa7jc-WD3pFYVU4vwqtqGCJmko4nK09A4xAvHTJClXyIfyCWltJJxT35gZaDmzcLY0D7t2VV0V9aGTR6ns" />
+        <Variable name="K8SFS_CA_PEM" value="/home/jboero/Desktop/k8s.ca.pem" />
+        <Variable name="KUBE_RENEW_TTL" value="30" />
+        <Variable name="KUBE_RENEW_TOKEN" value="export KUBE_TOKEN=$(/usr/lib64/google-cloud-sdk/bin/gcloud config config-helper --format=json | jq -r .credential.access_token)" />
       </EnvironmentVariables>
     </EnvironmentVariables>
   </PropertyGroup>
