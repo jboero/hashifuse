@@ -1,6 +1,6 @@
 Name:           tfefs
-Version:        0.1
-Release:        2
+Version:        0.2
+Release:        1
 Summary:        Hashicorp Terraform Enterprise Fuse Agent
 License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
