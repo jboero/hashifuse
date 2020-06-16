@@ -1,14 +1,14 @@
 ﻿# TFEFS
-Simple browseable CRUD dir+workspace structure of Terraform.  It's written in C++ with FUSE v28, libCurl, libJSONcpp.  Support exists for KV, SSH, TOTP, PKI, sys, Cubbyhole, and may work for others by default.
+Simple browseable CRUD dir+workspace structure of Terraform.  It's written in C++ with FUSE v28, libCurl, libJSONcpp.  Support exists for Runs, Plans, Logs, and Policies, and may work for others by default.
 
 Demo: [pending]
 
 # Running TFEFS
-Assuming you have a TFE account (SaaS or private on-prem), simply set TFE_ADDR (or leave blank for SaaS) and ATLAS_TOKEN, just like you would for API calls.
+Assuming you have a TFE account (SaaS or private on-prem), simply set TFE_ADDR (or leave blank for SaaS) and TFE_TOKEN, just like you would for API calls.
 
 ```
 $ export TFE_ADDR=http://localhost:8200
-$ export ATLAS_TOKEN=[YOUR TOKEN]
+$ export TFE_TOKEN=[YOUR TOKEN]
 $ ./tfefs -s -o direct_io /mnt/tfe (or your mount path)
 ```
 
@@ -27,13 +27,13 @@ fusermount -u /mnt/tfe (or your mount path)
 
 # Browsing Terraform
 Terraform accounts can be browsed like a local filesystem.  
-
+```
 [jboero@z600 ~]$ ls /mnt/tfe/organizations/
 Claranet-DemoV2  emea-se-playground-2019  hc-solutions-engineering  JoeStack  JohnBoero
 [jboero@z600 ~]$ ls /mnt/tfe/organizations/JohnBoero/
 policies  policy-sets  ssh-keys  workspaces
 [jboero@z600 ~]$ ls /mnt/tfe/organizations/JohnBoero/workspaces
-hashihang-eks  hashihang-pods  test3  test-airplus  tfe-test
+hashihang-eks  hashihang-pods  test3  test-customer  tfe-test
 [jboero@z600 ~]$ tree /mnt/tfe/organizations/JohnBoero/workspaces/hashihang-eks
 /mnt/tfe/organizations/JohnBoero/workspaces/hashihang-eks
 ├── applies
@@ -316,4 +316,4 @@ hashihang-eks  hashihang-pods  test3  test-airplus  tfe-test
     }
   ]
 }
-
+```

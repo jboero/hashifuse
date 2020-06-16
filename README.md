@@ -6,6 +6,8 @@ By mapping a REST endpoints to a filesystem, complex Vault secrets, Consul KV va
 # Building
 I'm not a full-time dev these days but I used to write FUSE filesystems quite a bit.  My choices of language and IDE are clearly dated, but MonoDevelop 5.9 was always a good IDE for me to debug multithreaded C++ FUSE apps, and git integration helps you check out directly from the IDE even if it's ancient.  Anyone who would like to port these to a different language is more than welcome.
 
+WARNING don't build with optimization flags (-O2, -O3, etc.) as it will result in segfaults.  I just spent hours with strace and wondering why I got segfaults and /dev/fuse permission denial.  Turns out everything works fine just without optimization.  Frustrating.
+
 _Dependencies for all three: libFUSE, libCurl, libjsoncpp_
 
 # Thoughts on FUSE
@@ -17,21 +19,25 @@ Simple browseable CRUD dir+file structure on KV storage.  Changes are made direc
 Demo: [TBD]
 
 # VaultFS
-Simple browseable CRUD dir+secret structure of Vault KV secrets.  Operations for other engines is undefined, but may work with correct directory structure.  There is nothing to stop you doing a generic read of PKI, SSH, DB secrets etc.
+Simple browseable CRUD dir+secret structure of Vault secrets.
 
-Demo: https://youtu.be/S_3j9Awlu-o
+Demo Video:
+[![IMAGE ALT TEXT](http://i3.ytimg.com/vi/S_3j9Awlu-o/maxresdefault.jpg)](https://youtu.be/S_3j9Awlu-o)
 
 # NomadFS
 Simple browseable CRUD file structure of Nomad jobs.  As this uses the REST API it requires JSON syntax instead of HCL.  You can read/copy/replace/edit Nomad jobs using the tool of your choice.
 
-Demo: https://youtu.be/THBi2ke1SlQ
+Demo Video:
+[![IMAGE ALT TEXT](http://i3.ytimg.com/vi/THBi2ke1SlQ/maxresdefault.jpg)](https://youtu.be/THBi2ke1SlQ)
 
 # TFEFS
 Terraform Enterprise organization + workspace browser, allowing access to runs, states, policies, variables, and more.
 
-Demo: [TBD]
+Demo:
+![TFEFS Demo Webp](tfefs.webp)
 
 # KubernetesFS
-Kubernetes namespace browser, allowing access to all resources in K8s v1.14.  This includes, DaemonSets, Deployments, RCs, Pods, Services, and more. Experimental.
+Kubernetes namespace browser, allowing access to all resources in K8s v1.14.  This includes, DaemonSets, Deployments, RCs, Pods, Services, and more. Experimental.  Works with OpenShift too.  Versions subject to unknown compatibility.
 
-Demo: https://www.youtube.com/watch?v=f5wjM-GKtLo
+Demo Video:
+[![IMAGE ALT TEXT](http://i3.ytimg.com/vi/f5wjM-GKtLo/maxresdefault.jpg)](https://youtu.be/f5wjM-GKtLo)
