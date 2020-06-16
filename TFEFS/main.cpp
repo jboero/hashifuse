@@ -290,7 +290,7 @@ int tfe_read(const char *path, char *buf, size_t size, off_t offset, struct fuse
 		buffer = stream.str();
 	}
 
-	len = min(size, buffer.length() - offset);
+	len = min((ulong)size, (ulong)(buffer.length() - offset));
 
 	// We've reached the end of the buffer? (DIRECT_IO)
 	if (offset >= len)
