@@ -9,14 +9,9 @@
 ** Note single threaded mode is currently mandatory for tfefs (-s flag)
 ** Note direct_io is mandatory right now until we can get key size in getattrs.
 ** Environment Variables: 
-<<<<<<< HEAD
 	TFE_ADDR			tfe address, or app.terraform.io by default (SaaS)  Example: "http://localhost:8200"
 	TFE_TOKEN			bearer token.
 	TFE_CACHE_EXPIRE	Seconds of inactivity before we flush all cache.  Default 300s.
-=======
-	TFE_ADDR		tfe address, or app.terraform.io by default (SaaS)  Example: "http://localhost:8200"
-	TFE_TOKEN		bearer token.
->>>>>>> f5ad2152e9c5409c9735ce4b0afe0364e1c25337
 
 ** This code is kept fairly simple/ugly without object oriented best practices.
 ** TODO: securely destroy strings - https://stackoverflow.com/questions/5698002/how-does-one-securely-clear-stdstring
@@ -99,13 +94,8 @@ int	tfeCURL(string url, stringstream &httpData, string request = "GET", const st
 	int res = 0, httpCode = 0;
 	string tokenHeader = "Authorization: Bearer ";
 	struct curl_slist *headers = curl_slist_append(NULL, (tokenHeader + getenv("TFE_TOKEN")).c_str());
-<<<<<<< HEAD
 	headers = curl_slist_append(headers, "Content-Type: application/vnd.api+json");
 	static CURL* curl = curl_easy_init();
-=======
-	headers = curl_slist_append(headers, nsHeader);
-	CURL* curl;
->>>>>>> f5ad2152e9c5409c9735ce4b0afe0364e1c25337
 
 	if (getenv("TFE_ADDR"))
 		url = (string)getenv("TFE_ADDR") + url;
