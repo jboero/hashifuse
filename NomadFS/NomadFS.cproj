@@ -55,7 +55,9 @@
     <None Include="Config\run.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Config\nomadfs-rpm.spec" />
+    <None Include="..\..\HashiFuse\NomadFS\Config\nomadfs-rpm.spec">
+      <Link>Config\nomadfs-rpm.spec</Link>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.cpp" />
