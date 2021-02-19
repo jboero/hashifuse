@@ -8,7 +8,7 @@ I'm not a full-time dev these days but I used to write FUSE filesystems quite a 
 
 WARNING don't build with optimization flags (-O2, -O3, etc.) as it will result in segfaults.  I just spent hours with strace and wondering why I got segfaults and /dev/fuse permission denial.  Turns out everything works fine just without optimization.  Frustrating.
 
-_Dependencies for all three: libFUSE, libCurl, libjsoncpp_
+_Dependencies for all: libFUSE, libCurl, libjsoncpp_
 
 # Thoughts on FUSE
 Linus Torvalds has famously said FUSE is a toy.  He's absolutley right.  While working with Gluster I once wrote a dummy fs that performed no operations whatsoever to test maximum theoretical throughput via kernel mode switches.  On a Broadwell system maxing out a single core 100%, the most I would ever be able to read or write maxed out at about 1.0 GB/s.  Given kernel cache and RAMFS exceed 8GB/s on DDR3 with zero CPU load, it's pretty clear FUSE should never be used for block storage.  The good news is these are simple small bits of REST call, so FUSE is an ideal toy.  Bottom line - don't trust these to have optimal performance.

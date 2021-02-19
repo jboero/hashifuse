@@ -34,7 +34,7 @@ Requires libcurl, jsoncpp</Description>
     <ExtraLinkerArguments>-lfuse</ExtraLinkerArguments>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="VAULT_TOKEN" value="eutjguU5DT6D5KF8UVRkKGQI" />
+        <Variable name="VAULT_TOKEN" value="root" />
         <Variable name="VAULT_ADDR" value="http://localhost:8200" />
         <Variable name="no_proxy" value="localhost" />
         <Variable name="http_proxy" value="" />
