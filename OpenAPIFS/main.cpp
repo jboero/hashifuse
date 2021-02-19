@@ -1,13 +1,13 @@
 ﻿/****************************************************************************
 **
-** openapifs - FUSE client for browsing Hashicorp Terraform Enterprise.
+** openapifs - FUSE client for browsing Swagger/OpenAPI endpoints via schema.
 **
 ** Authored by John Boero
 ** Build instructions: g++ -D_FILE_OFFSET_BITS=64 -lfuse -lcurl -ljsoncpp main.cpp
-** Usage: ./openapifs -s -o direct_io /path/to/mount
+** Usage: openapifs -s -o direct_io /path/to/mount
 **
-** Note single threaded mode is currently mandatory for openapifs (-s flag)
-** Note direct_io is mandatory right now until we can get key size in getattrs.
+** Note single threaded mode is required (-s)
+** Note direct_io is required (-o direct_io)
 ** Environment Variables: 
 	API_ADDR			Base api address.
 		Example: "https://localhost:8200"
@@ -19,24 +19,26 @@
 		Example: "300"
 ****************************************************************************/
 
+#define _GNU_SOURCE 1
 #define CURL_STATICLIB
 #define FUSE_USE_VERSION 30
 
 #include <string>
-#include <string.h>
 #include <sstream>
 #include <set>
 #include <vector>
 #include <iostream>
 #include <algorithm>
 #include <regex>
-#include <libgen.h>
+#include <mutex>
+#include <fstream>
+//#include <filesystem>	// C++17 required
 
+#include <string.h>
+#include <libgen.h>
 #include <curl/curl.h>
 #include <json/json.h>
 
-#include <mutex>
-#include <fstream>
 #include <unistd.h>
 #include <sys/xattr.h>
 #include <stdarg.h>
@@ -53,6 +55,7 @@ const char BLUE[]	= "\e[0;34m";
 
 using namespace std;
 
+// Ugly globals as we don't get full process control.
 // Cache the OpenAPI spec
 Json::Value schema;
 
@@ -66,6 +69,7 @@ mutex curlmutex;
 map<string, string> cache;
 time_t cache_timestamp = time(NULL);
 int cache_ttl = 300;
+string apiaddr, response;
 
 // CURL callback
 namespace
@@ -82,23 +86,15 @@ namespace
     }
 }
 
-void PrintJsonDebug(const Json::Value &j)
-{
-	Json::StreamWriterBuilder builder;
-	builder["indentation"] = ""; // If you want whitespace-less output
-	const string output = Json::writeString(builder, j);
-}
-
 // openapifs GET raw via libcurl
-// Currently supports request GET (default), POST, LIST.
-// TODO: escape environment variables for injection vulnerabilities.
 int	apiCURL(string url, stringstream &httpData, string request = "GET", const string post = "")
 {
 	int res = 0, httpCode = 0;
 	struct curl_slist *headers = curl_slist_append(NULL, getenv("API_TOKEN"));
-	headers = curl_slist_append(headers, "Content-Type: application/vnd.api+json");
+	//headers = curl_slist_append(headers, "Content-Type: application/vnd.api+json");
 	static CURL* curl = curl_easy_init();
-	
+
+	//url = (string)getenv("API_ADDR") + url;
 	if (time(NULL) - cache_timestamp > cache_ttl)
 		cache.clear();
 	try
@@ -108,8 +104,9 @@ int	apiCURL(string url, stringstream &httpData, string request = "GET", const st
 		cout << GREEN << "Using cache for " << url << RESET << endl;
 		return 0;
 	}
-	catch (exception e)
+	catch (exception &e)
 	{
+		cerr << "Cache: " << e.what()<<endl;
 	}
 
 	#if DEBUG
@@ -121,22 +118,22 @@ int	apiCURL(string url, stringstream &httpData, string request = "GET", const st
 		if (!curl)
 			return -1;
 
-		if (res = curl_easy_setopt(curl, CURLOPT_URL, url.c_str()))
+		if ((res = curl_easy_setopt(curl, CURLOPT_URL, url.c_str())))
 			return res;
 
-		if (res = curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request.c_str()))
+		if ((res = curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, request.c_str())))
 			return res;
 
 		if (request == "POST" && post != "")
 		{
-			if (res = curl_easy_setopt(curl, CURLOPT_POST, 1))
+			if ((res = curl_easy_setopt(curl, CURLOPT_POST, 1)))
 				return res;
 
-			if (res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post.c_str()))
+			if ((res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post.c_str())))
 				return res;
 	 	}
 		
-		if (res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers))
+		if ((res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers)))
 			return res;
 
 		curl_easy_setopt(curl, CURLOPT_TIMEOUT, 5);
@@ -179,14 +176,14 @@ int	apiCURLjson(string url, Json::Value &jsonData, string request = "GET", strin
 	Json::CharReaderBuilder jsonReader;
 	int	res = 0;
 
-	if (res = apiCURL(url, stream, request, post))
+	if ((res = apiCURL(url, stream, request, post)))
 		return res;
 
 	try
 	{
 		stream >> jsonData;
 	}
-	catch (exception e)
+	catch (exception &e)
 	{
 		cerr <<YELLOW<< "WARNING JSON problem.  Possibly data is too large for maxread: " << e.what() <<RESET<<endl;
 	}
@@ -207,55 +204,97 @@ int api_getattr(const char *path, struct stat *stat)
 	stat->st_atime = stat->st_mtime = stat->st_ctime = time(NULL);
 	stat->st_mode = S_IFDIR | 0700;			// Dir default
 
-	//if (spec.isMember(basename((char*)path)))
-		
 	if (p == "/clear_cache")
 		stat->st_mode = S_IFREG | 0200;		// Any write /clear_cache
 	else if (p == "/response")
 		stat->st_mode = S_IFREG | 0400;		// Read last response
+	else if (regex_match(p, (regex)"^(.*).json$"))
+		stat->st_mode = S_IFLNK | 0777;		// .json symlinks
 	else if (regex_match(p, (regex)"^(.*)\\{(.*)\\}$"))
 		stat->st_mode = S_IFREG | 0000;		// If using {name} examples
-	else if (regex_match(p, (regex)"^(.*)/(post|put|delete|patch|.*\\.json)$"))
-		stat->st_mode = S_IFREG | 0600;		// Writeable
-	else if (regex_match(p, (regex)"^(.*)/(get|schema|description|summary|options|trace|servers|parameters)$"))
-		stat->st_mode = S_IFREG | 0400;		// Readable
-
+	else if (regex_match(p, (regex)"^(.*)/(post|put|delete|patch|.*\\..*)$"))
+		stat->st_mode = S_IFREG | 0600;
+	else if (regex_match(p, (regex)"^(.*)/(get|description|summary|options|trace|servers|parameters)$"))
+		stat->st_mode = S_IFREG | 0400;
+	
 	return 0;
 }
 
 int api_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
-	// To prevent double reads, buffer last read (single thread only!)
-	static string buffer;
-	string p(path), org, workspace, endpoint;
-	const size_t slashes = count(p.begin(), p.end(), '/');
-	Json::Value keys;
-	int len;
+	// To prevent double reads, static buffer last read (single thread only!)
+	string buffer, p(path), token, bname, dname;
+	int len = size;
+	Json::Value jbuf;
 
-	if (regex_match(p, (regex)"^(.*)/description$"))
-		buffer = schema["paths"][p.substr(0, p.size() - 12)]["description"].asString();
+	if (regex_match(p, (regex)".*.json"))
+	{
+		((char*)path)[p.length() - 5] = '\0';
+		p = path;
+	}
 
-	len = min((ulong)size, (ulong)(buffer.length() - offset));
+	if (p == "/response")
+	{
+		strncpy(buf + offset, response.c_str() + offset, len);
+		return len;
+	}
 
-	strncpy(buf + offset, buffer.c_str() + offset, len);
+	bname = basename((char*)path);
+	dname = dirname((char*)path);
+	try
+	{
+		jbuf = schema["paths"][dname];
+		// If post, fetch template with schema.
+		if (bname == "post")
+			buffer = (string)"{\n\t\"$schema\":\"" + getenv("FUSEPATH") + p + ".schema\"\n}\n";
+		else if (bname == "post.schema")	// Schema has a slash (application/json) so shortcut it.
+			buffer = jbuf["post"]["requestBody"]["content"]["application/json"]["schema"].toStyledString();
+		// If get or get?params=etc, but not get.sub
+		else if (bname == "description")
+			buffer = jbuf["description"].asString();
+		else if (regex_match(p, (regex)"^(.*)/get([^.]|$)"))
+		{
+			stringstream res;
+			if (apiCURL(apiaddr + dname, res))
+				return -ENOENT;
+			
+			buffer = res.str();
+		}
+		else // Interpret dots ala jq to select json (even without readdir)
+		{
+			stringstream dots(bname);
+			while (getline(dots, token, '.'))
+				jbuf = jbuf[token];
+		
+			buffer = jbuf.toStyledString();
+		}
+
+		len = min((ulong)size, (ulong)(buffer.length() - offset));
+
+		strncpy(buf + offset, buffer.c_str() + offset, len);
+	}
+	catch (exception &e)
+	{
+		cerr <<YELLOW<< "WARNING: " << e.what() <<RESET<<endl;
+		return -ENOENT;
+	}
 	return len;
 }
 
 int api_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
-	string p(path + 1), payload(buf);
-	Json::Value mount, data;
-	Json::StreamWriterBuilder builder;
+	string p(path), dname, verb;
 	stringstream stream;
-	size_t mlen;
 
-	if ((mlen = p.find('/')) == string::npos)
-		return -ENOTDIR;
+	verb = basename((char*)path);
+	dname = dirname((char*)path);
 
 	// TODO patch vars...
-	if (apiCURL((string)getenv("API_URL") + '/' + p, stream, "PATCH", payload.c_str()))
+	if (apiCURL(apiaddr + p, stream, verb, buf))
 		return -EINVAL;
-
+	else
+		response = stream.str();
+	
 	return size;
 }
 
@@ -300,19 +339,26 @@ int api_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 	smatch match;
 	Json::Value paths = schema["paths"];
 	Json::Value desc  = paths[p];
-	Json::Value::Members contents = paths.getMemberNames();
+	Json::Value::Members rootContents = paths.getMemberNames();
 
 	if (p == "/")
 	{
 		uniques.insert("clear_cache");
 		uniques.insert("response");
+		uniques.insert("response.json");
 	}
 	else
 	{
 		// Get spec attribs
 		Json::Value::Members ops = desc.getMemberNames();
 		for(vector<string>::const_iterator i = ops.begin(); i!= ops.end(); i++)
+		{
+			if (regex_match(*i, (regex)"^.*\\.\\*$"))
+				continue;
+			
 			uniques.insert(*i);
+			uniques.insert(*i + ".json");
+		}
 	}
 
 	cout <<GREEN<< p <<RESET<<endl;
@@ -320,12 +366,15 @@ int api_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 	regex r("(" + p.substr(1) + "/)[^/]+");
 
 	// Get obvious members.
-	for(vector<string>::const_iterator i = contents.begin(); i!= contents.end(); i++)
+	for(vector<string>::const_iterator i = rootContents.begin(); i!= rootContents.end(); i++)
 	{
+		if (regex_match(*i, (regex)"^.*\\.\\*$"))
+			continue;
+		
 		if (regex_search(i->begin(), i->end(), match, r))
 		{
-			//cout <<CYAN<< match[0] <<RESET<<endl;
-			uniques.insert(match.str(0).substr(p.length()));
+			string m = match.str(0);
+			uniques.insert(m.substr(p.length()));
 		}
 	}
 
@@ -334,7 +383,7 @@ int api_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 	{
 		Json::Value list;
 		string basepath = basename((char*)p.c_str());
-		apiCURLjson(getenv("API_ADDR") + basepath, list, "LIST");
+		apiCURLjson(apiaddr + basepath, list, "LIST");
 		for (Json::Value::ArrayIndex i = 0; i != list["data"]["keys"].size(); ++i)
 		{
 			string key = list["data"]["keys"][i].asString();
@@ -352,19 +401,19 @@ int api_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 	return 0;
 }
 
-static void my_lock(CURL *handle, curl_lock_data data, curl_lock_access laccess, void *useptr)
+// Implicit link from ${VALUE}.json to ${VALUE}
+static int api_readlink(const char *path, char *buf, size_t size)
 {
-	(void)handle;
-	(void)data;
-	(void)laccess;
-	(void)useptr;
-}
- 
-static void my_unlock(CURL *handle, curl_lock_data data, void *useptr)
-{
-	(void)handle;
-	(void)data;
-	(void)useptr;
+	char *bname = basename((char*)path);
+	int blen = strlen(bname);
+
+	cout <<BLUE<< bname <<RESET<< endl;
+	if (regex_match(path, (regex)"^(.*).json$"))
+		strncpy(buf, bname, blen - 5);
+	else
+		return 1;
+	
+	return 0;
 }
 
 void* api_init(struct fuse_conn_info *conn)
@@ -375,25 +424,28 @@ void* api_init(struct fuse_conn_info *conn)
 	// Did we specify cache expiration seconds?
 	if (getenv("API_CACHE_TTL"))
 		cache_ttl = atoi(getenv("API_CACHE_TTL"));
+	if (getenv("API_ADDR"))
+		apiaddr = getenv("API_ADDR");
 	
 	apiCURLjson(getenv("API_SPEC"), schema);
 
 	return NULL;
 }
 
-// Need to implement this for truncate/write.
+// Stub required for truncate/write.
 int api_truncate(const char *path, off_t newsize)
 {
 	return 0;
 }
 
-// TODO: Could add api metadata and mount types as xattrs.
-
+// RFE: Could add api metadata and mount types as xattrs.
+// RFE: Sanitize inputs and env variables.
 int main(int argc, char *argv[])
 {
 	struct fuse_operations fuse = 
 	{
 		.getattr = api_getattr,
+		.readlink = api_readlink,
 		.truncate = api_truncate,
 		.read = api_read,
 		.write = api_write,
@@ -404,6 +456,12 @@ int main(int argc, char *argv[])
 
 	if ((getuid() == 0) || (geteuid() == 0))
 		cerr << YELLOW << "WARNING Running a FUSE filesystem as root opens security holes" << endl;
+	
+	// Save last arg mount path in env var
+	if (argc > 1)
+		setenv("FUSEPATH", argv[argc-1], 0);
+	else
+		return 1;
 	
 	return fuse_main(argc, argv, &fuse, NULL);
 }

@@ -4,29 +4,34 @@ Simple browseable CRUD dir+workspace structure of Terraform.  It's written in C+
 Demo: [pending]
 
 # Running OpenAPIFS
-Assuming you have a TFE account (SaaS or private on-prem), simply set TFE_ADDR (or leave blank for SaaS) and TFE_TOKEN, just like you would for API calls.
-
+The following 4 env variables are provided for generic usage of openapifs on any static or dynamic OpenAPIv3 schema:
 ```
-$ export TFE_ADDR=http://localhost:8200
-$ export TFE_TOKEN=[YOUR TOKEN]
-$ ./openapifs -s -o direct_io /mnt/tfe (or your mount path)
+API_ADDR			Base api address.
+	Example: "https://localhost:8200"
+API_SPEC			Full location of OpenAPI v3 spec.
+	Example: "https://localhost:8200/v1/openapi"
+API_TOKEN			Full auth bearer token header.
+	Example: "Authorization: Bearer d8e8fca2dc0f896fd7cb4cb0031ba249"
+API_CACHE_TTL		Seconds of inactivity before we flush all cache.  Default 300s.
+	Example: "300"
+./openapifs -s -o direct_io /mnt/api (or your mount path)
 ```
 
 In the event you need to specify a CA bundle, libcurl doesn't seem to use curl's standard environment variables.  Instead you can place your PEM bundle into ~/OpenAPIFS.pem and OpenAPIFS will attempt to use it.  This allows self-signed certs which isn't recommended for production.
 
 For debugging, best results via single threaded DEBUG build:
 ```
-$ ./openapifs -d -s -o direct_io /mnt/tfe
+$ ./openapifs -d -s -o direct_io /mnt/api
 ```
 
 # Stopping OpenAPIFS
 To stop OpenAPIFS running, or reset it in event of an issue, just dismount the fs:
 ```
-fusermount -u /mnt/tfe (or your mount path)
+fusermount -u /mnt/api (or your mount path)
 ```
 
 # Browsing Terraform
-Terraform accounts can be browsed like a local filesystem.  
+Api endpoints can be browsed like a local filesystem.
 
 ![OpenAPIFS Demo Webp](/openapifs.webp)
 

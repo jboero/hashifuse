@@ -31,18 +31,18 @@ Requires libcurl, jsoncpp</Description>
     <CompileTarget>Bin</CompileTarget>
     <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
     <SourceDirectory>.</SourceDirectory>
-    <ExtraCompilerArguments>-g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
+    <ExtraCompilerArguments>-Wall -g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
     <Commandlineparameters>-d -s -f -o direct_io,max_write=1048576,max_read=1048576 /mnt/api</Commandlineparameters>
     <ExtraLinkerArguments>-lfuse</ExtraLinkerArguments>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="API_TOKEN" value="Authorization: Bearer s.7l8UzvnyCgj3srZvnhGiBim1" />
+        <Variable name="API_TOKEN" value="Authorization: Bearer yourtoken" />
         <Variable name="API_SPEC" value="http://vault:8200/v1/sys/internal/specs/openapi" />
         <Variable name="API_CACHE_TTL" value="3600" />
         <Variable name="API_ADDR" value="http://vault:8200/v1" />
       </EnvironmentVariables>
     </EnvironmentVariables>
-    <Externalconsole>true</Externalconsole>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release</OutputPath>
