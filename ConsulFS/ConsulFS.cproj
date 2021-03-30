@@ -63,7 +63,6 @@
     <None Include="Config\run.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\HashiFuse\ConsulFS\Config\consulfs-rpm.spec" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.cpp" />

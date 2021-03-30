@@ -72,9 +72,6 @@ Requires libcurl, jsoncpp</Description>
     <None Include="Makefile" />
     <None Include="README.md" />
     <None Include="Config\Dockerfile" />
-    <None Include="..\..\HashiFuse\VaultFS\Config\vaultfs-rpm.spec">
-      <Link>Config\vaultfs-rpm.spec</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />

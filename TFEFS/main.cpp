@@ -419,6 +419,7 @@ int tfe_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 			filler(buf, "vars", NULL, 0);
 			filler(buf, "runs", NULL, 0);
 			filler(buf, "current-state-version", NULL, 0);
+			filler(buf, "cost-estimates", NULL, 0);
 		}
 	}
 	else if (slashes == 5)			// /organizations/JohnBoero/workspaces/test3/{plans,etc}

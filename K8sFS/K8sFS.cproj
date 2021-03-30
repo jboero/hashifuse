@@ -60,7 +60,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="README.md" />
-    <None Include="..\..\HashiFuse\K8sFS\Config\k8sfs-rpm.spec" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.cpp" />
