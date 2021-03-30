@@ -216,7 +216,7 @@ int tfe_getattr(const char *path, struct stat *stat)
 	//stat->st_atime = stat->st_mtime = stat->st_ctime = 0;
 
 	// Some dir levels are actually files.
-	if (regex_match(p, (regex)"/organizations/(.*)/workspaces/(.*)/vars")
+	if (regex_match(p, (regex)"/organizations/(.*)/workspaces/(.*)/(vars|json)")
 	||	regex_match(p, (regex)"/organizations/(.*)/workspaces/current-state-version")
 	||	regex_match(p, (regex)"/organizations/(.*)/policies/(.*)")
 	||	regex_match(p, (regex)"/organizations/(.*)/policy-sets/(.*)")
@@ -268,7 +268,7 @@ int tfe_read(const char *path, char *buf, size_t size, off_t offset, struct fuse
 			getline(sp, org, '/');		// JohnBoero
 			getline(sp, type, '/');	// workspaces,policies,etc
 			getline(sp, l5, '/');		// ws, policy, etc
-			getline(sp, l6, '/');		// plans, applies, runs, etc
+			getline(sp, l6, '/');		// plans, applies, runs, raw, vars, etc
 			getline(sp, l7, '/');		// plan, run, etc
 
 			if (type == "workspaces")
@@ -276,6 +276,8 @@ int tfe_read(const char *path, char *buf, size_t size, off_t offset, struct fuse
 				if (l6 == "vars")
 					endpoint = apiVers + "/vars?filter[organization][name]="
 						+ org + "&filter[workspace][name]=" + l5;
+				else if (l6 == "json")
+					endpoint = apiVers + p.substr(0, p.length() - 5);
 				else
 					endpoint = apiVers + '/' + l6 + "/" + l7;
 			}
@@ -393,7 +395,7 @@ int tfe_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 	else if (slashes == 3)			// /organizations/JohnBoero/workspaces
 	{
 		// List via GET, not LIST....
-		tfeCURLjson(apiVers + p, keys);
+		tfeCURLjson(apiVers + p +"?page[size]=100", keys);
 		keys = keys["data"];
 
 		for (Json::Value::ArrayIndex i = 0; i != keys.size(); ++i)
@@ -416,8 +418,10 @@ int tfe_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 			filler(buf, "plans", NULL, 0);
 			filler(buf, "applies", NULL, 0);
 			filler(buf, "state-versions", NULL, 0);
+			filler(buf, "state-version-outputs", NULL, 0);
 			filler(buf, "vars", NULL, 0);
 			filler(buf, "runs", NULL, 0);
+			filler(buf, "json", NULL, 0);
 			filler(buf, "current-state-version", NULL, 0);
 			filler(buf, "cost-estimates", NULL, 0);
 		}
