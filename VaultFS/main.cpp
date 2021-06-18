@@ -18,7 +18,7 @@
 ****************************************************************************/
 
 #define CURL_STATICLIB
-#define FUSE_USE_VERSION 26
+#define FUSE_USE_VERSION 30
 
 #include <string>
 #include <string.h>
@@ -28,6 +28,8 @@
 #include <iostream>
 #include <algorithm>
 #include <regex>
+#include <initializer_list>
+//#include <cppcodec/base64_rfc4648.hpp>
 
 #include <curl/curl.h>
 #include <json/json.h>
@@ -79,6 +81,24 @@ namespace
 		#endif
         return size * num;
     }
+}
+
+// Helper to output a message to the client process stdout or stderr.
+// /proc/{clientPID}/fd/{stream}
+// Defaults to stdout (1), set stream to 2 for stderr.
+// Returns 0 on success or 1 if ostream errors.
+int clientOut(string output, short stream = 1)
+{
+	fuse_context *con = fuse_get_context();
+	ofstream out((string)"/proc/" + to_string(con->pid) + "/fd/" + to_string(stream));
+
+	if (out)
+	{
+		out << output;
+		return 0;
+	}
+	else
+		return 1;
 }
 
 // Vault GET raw via libcurl
@@ -160,11 +180,18 @@ int	vaultCURLjson(string url, Json::Value &jsonData, string request = "GET", str
 	Json::CharReaderBuilder jsonReader;
 	int	res = 0;
 
-	if (res = vaultCURL(url, stream, request, post))
-		return res;
-
-	stream >> jsonData;
-
+	try 
+	{
+		if (res = vaultCURL(url, stream, request, post))
+			return res;
+		
+		stream >> jsonData;
+	}
+	catch (exception e)
+	{
+		*logs << RED << e.what() << RESET << endl;
+		return 1;
+	}
 	return 0;
 }
 
@@ -252,7 +279,13 @@ int vault_getattr(const char *path, struct stat *stat)
 			stat->st_mode = S_IFREG | 0600;
 		else
 			stat->st_mode = S_IFDIR | 0700;
- 
+
+		// Transit key operations are trickier
+		if (regex_match(p, (regex)".*/(encrypt|decrypt|sign|verify|hmac)"))
+			stat->st_mode = S_IFDIR | 0700;
+		else if (regex_match(p, (regex)".*/(encrypt|decrypt|sign|verify|hmac)/.*"))
+			stat->st_mode = S_IFREG | 0600;
+		
 		return 0;
 	}
 	else if (mountType == "system")
@@ -396,8 +429,13 @@ int vault_write(const char *path, const char *buf, size_t size, off_t offset, st
 	//p.insert(mlen, "/data");
 
 	if (vaultCURL(apiVers + '/' + p, stream, "POST", payload.c_str()))
+	{
+		clientOut(stream.str(), 2);
 		return -EINVAL;
+	}
 
+	// Dump any response to client process stdout.
+	clientOut(stream.str());
 	return size;
 }
 
@@ -443,6 +481,12 @@ void fillMembers(Json::Value &root, void *buf, fuse_fill_dir_t filler)
 		    iter->erase(pos);
 		filler(buf, iter->c_str(), NULL, 0);
 	}
+}
+
+void fillAll(void *buf, initializer_list<string> strings, fuse_fill_dir_t filler)
+{
+	for (string add : strings) 
+		filler(buf, add.c_str(), NULL, 0);
 }
 
 // Readdir manually builds out dir structure based on /sys/mounts
@@ -501,17 +545,10 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 	else if (regex_match(mountType, (regex)"(pki|ssh)"))
 	{
 		if (p == smount)	// If we're just listing at the /pki level,
-		{
-			filler(buf, "ca", NULL, 0);
-			filler(buf, "roles", NULL, 0);
-			filler(buf, "certs", NULL, 0);	// Only for PKI
-			filler(buf, "creds", NULL, 0);	// Only for SSH
-		}
+			fillAll(buf, {"ca", "roles", "certs", "creds"}, filler);
 		else if (p == smount + "certs/")
 		{
-			filler(buf, "ca", NULL, 0);
-			filler(buf, "crl", NULL, 0);
-			filler(buf, "ca_chain", NULL, 0);
+			fillAll(buf, {"ca", "crl", "ca_chain"}, filler);
 			if (res = vaultCURLjson(apiVers + '/' + smount + "/certs", keys, "LIST"))
 				return -ENOENT;
 			fillArray(keys["data"]["keys"], buf, filler);
@@ -531,21 +568,20 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 	{
 		if (p == smount)
 		{
-			filler(buf, "keys", NULL, 0);
-			filler(buf, "random", NULL, 0);
+			fillAll(buf, {"keys", "encrypt", "decrypt", "sign", "verify", "hmac"}, filler);
 			return 0;
 		}
-		//else if (p == smount + "keys/") // fallback to default handler.
-		// TODO browse versions.
+		else if (regex_match(p, (regex)(smount + "(encrypt|decrypt|sign|verify|hmac)/.*")))
+		{
+			// We're doing a key operation.  List keys again.
+			p = smount + "/keys";
+		}
 	}
 	else if (mountType == "gcp")
 	{
 		if (p == smount)
 		{
-			filler(buf, "config", NULL, 0);
-			filler(buf, "roleset", NULL, 0);
-			filler(buf, "token", NULL, 0);
-			filler(buf, "key", NULL, 0);
+			fillAll(buf, {"config", "roleset", "token", "key"}, filler);
 			return 0;
 		}
 	}
@@ -553,10 +589,7 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 	{
 		if (p == smount)
 		{
-			filler(buf, "config", NULL, 0);
-			filler(buf, "roles", NULL, 0);
-			filler(buf, "creds", NULL, 0);
-			filler(buf, "sts", NULL, 0);
+			fillAll(buf, {"config", "roles", "creds", "sts"}, filler);
 			return 0;
 		}
 	}
@@ -564,14 +597,8 @@ int vault_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t off
 	{
 		if (p == "sys/")
 		{
-			filler(buf, "config", NULL, 0);
-			filler(buf, "health", NULL, 0);
-			filler(buf, "license", NULL, 0);
-			filler(buf, "namespaces", NULL, 0);
-			filler(buf, "mounts", NULL, 0);
-			filler(buf, "replication", NULL, 0);
-			filler(buf, "tools", NULL, 0);
-			filler(buf, "policy", NULL, 0);
+			fillAll(buf, {"config", "health", "license", "namespaces", 
+				"mounts", "replication", "tools", "policy"}, filler);
 			return 0;
 		}
 		else if (p == "sys/policy/")

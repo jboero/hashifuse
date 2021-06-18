@@ -24,6 +24,7 @@
 #include <sstream>
 #include <set>
 #include <iostream>
+#include <algorithm>
 #include <curl/curl.h>
 #include <json/json.h>
 #include <unistd.h>
@@ -71,6 +72,24 @@ namespace
 		#endif
         return size * num;
     }
+}
+
+// Helper to output a message to the client process stdout or stderr.
+// /proc/{clientPID}/fd/{stream}
+// Defaults to stdout (1), set stream to 2 for stderr.
+// Returns 0 on success or 1 if ostream errors.
+int clientOut(string output, short stream = 1)
+{
+	fuse_context *con = fuse_get_context();
+	ofstream out((string)"/proc/" + to_string(con->pid) + "/fd/" + to_string(stream));
+
+	if (out)
+	{
+		out << output;
+		return 0;
+	}
+	else
+		return 1;
 }
 
 // Easy libcurl
@@ -256,7 +275,7 @@ int consul_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t of
 	getline(sp, l1, '/');		// nodes,catalog,kv,etc
 	getline(sp, l2, '/');		// leaf
 
-	regex_search(p.begin(), p.end(), matches, (regex)".*/.*");
+	//regex_search(p.begin(), p.end(), matches, (regex)".*/.*");
 	if (p == "/")
 	{
 		if (consulCURLjson(apiVers + p + "catalog/datacenters", keys))
@@ -273,7 +292,7 @@ int consul_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t of
 	}
 	else if (depth == 3)
 	{
-		if 
+		
 		filler(buf, "nodes", NULL, 0);
 		filler(buf, "kv", NULL, 0);
 		filler(buf, "catalog", NULL, 0);

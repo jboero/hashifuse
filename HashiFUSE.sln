@@ -52,5 +52,6 @@ Global
 		$0.VersionControlPolicy = $2
 		$2.inheritsSet = Mono
 		description = Set of FUSE clients for Hashicorp stack.
+		version = 0.2
 	EndGlobalSection
 EndGlobal

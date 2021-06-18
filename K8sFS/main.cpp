@@ -82,6 +82,24 @@ namespace
     }
 }
 
+// Helper to output a message to the client process stdout or stderr.
+// /proc/{clientPID}/fd/{stream}
+// Defaults to stdout (1), set stream to 2 for stderr.
+// Returns 0 on success or 1 if ostream errors.
+int clientOut(string output, short stream = 1)
+{
+	fuse_context *con = fuse_get_context();
+	ofstream out((string)"/proc/" + to_string(con->pid) + "/fd/" + to_string(stream));
+
+	if (out)
+	{
+		out << output;
+		return 0;
+	}
+	else
+		return 1;
+}
+
 // Easy libcurl
 // Currently supports request GET (default), PUT, LIST, DELETE
 // TODO: sanitize environment variables for injection vulnerabilities.
@@ -231,8 +249,10 @@ int k8s_read(const char *path, char *buf, size_t size, off_t offset, struct fuse
 
 	// TODO adapt this for different types
 	if (k8sCURL(getRESTbase(p) + p + "?pretty=true", &sstream))
+	{
 		return -ENOENT;
-	
+	}
+
 	data = sstream.str();
 	if (data.length() - offset <= 0)
 		return 0;

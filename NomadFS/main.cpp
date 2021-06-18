@@ -65,6 +65,24 @@ namespace
     }
 }
 
+// Helper to output a message to the client process stdout or stderr.
+// /proc/{clientPID}/fd/{stream}
+// Defaults to stdout (1), set stream to 2 for stderr.
+// Returns 0 on success or 1 if ostream errors.
+int clientOut(string output, short stream = 1)
+{
+	fuse_context *con = fuse_get_context();
+	ofstream out((string)"/proc/" + to_string(con->pid) + "/fd/" + to_string(stream));
+
+	if (out)
+	{
+		out << output;
+		return 0;
+	}
+	else
+		return 1;
+}
+
 // Easy libcurl
 // Currently supports request GET (default), PUT, LIST, DELETE
 // TODO: sanitize environment variables for injection vulnerabilities.
@@ -187,7 +205,7 @@ int nomad_getattr(const char *path, struct stat *stat)
 int nomad_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
 	string data, p(path);
-	stringstream sstream;
+	stringstream stream;
 
 	// If we're a new file - just read 0.
 	if (createds.find(path) != createds.end())
@@ -195,10 +213,13 @@ int nomad_read(const char *path, char *buf, size_t size, off_t offset, struct fu
 	
 	// Chop off pseudo ".json" we added.
 	p = p.substr(0, p.length() - 5);
-	if (nomadCURL(apiVers + p.substr() + "?pretty", sstream))
-		return -ENOENT;
+	if (nomadCURL(apiVers + p.substr() + "?pretty", stream))
+	{
+		clientOut(stream.str(), 2);
+		return -EINVAL;
+	}
 
-	data = sstream.str();
+	data = stream.str();
 	if (data.length() - offset <= 0)
 		return 0;
 
@@ -218,10 +239,15 @@ int nomad_write(const char *path, const char *buf, size_t size, off_t offset, st
 	delete [] tmp;
 
 	if (nomadCURL(apiVers + "/jobs", stream, "POST", jobspec.c_str()))
+	{
+		clientOut(stream.str(), 2);
 		return -EINVAL;
-	
+	}
+
 	if (createds.find(path) != createds.end())
 		createds.erase(path);
+	
+	clientOut(stream.str());
 	return size;
 }
 

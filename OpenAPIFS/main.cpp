@@ -69,7 +69,7 @@ mutex curlmutex;
 map<string, string> cache;
 time_t cache_timestamp = time(NULL);
 int cache_ttl = 300;
-string apiaddr, response;
+string apiaddr;
 
 // CURL callback
 namespace
@@ -144,7 +144,7 @@ int	apiCURL(string url, stringstream &httpData, string request = "GET", const st
 		// Optional setting CA bundle... not ideal but libcurl doesn't use env variables.
 		if (access("~/openapifs.pem", F_OK) != -1)
 			curl_easy_setopt(curl, CURLOPT_CAINFO, "~/openapifs.pem");
-
+		
 		#if DEBUG
 		if (post != "")
 			*logs << YELLOW << post << RESET << endl;
@@ -173,7 +173,6 @@ int	apiCURL(string url, stringstream &httpData, string request = "GET", const st
 int	apiCURLjson(string url, Json::Value &jsonData, string request = "GET", string post = "")
 {
 	stringstream stream;
-	Json::CharReaderBuilder jsonReader;
 	int	res = 0;
 
 	if ((res = apiCURL(url, stream, request, post)))
@@ -191,6 +190,24 @@ int	apiCURLjson(string url, Json::Value &jsonData, string request = "GET", strin
 	return 0;
 }
 
+// Helper to output a message to the client process stdout or stderr.
+// /proc/{clientPID}/fd/{stream}
+// Defaults to stdout (1), set stream to 2 for stderr.
+// Returns 0 on success or 1 if ostream errors.
+int clientOut(string output, short stream = 1)
+{
+	fuse_context *con = fuse_get_context();
+	ofstream out((string)"/proc/" + to_string(con->pid) + "/fd/" + to_string(stream));
+
+	if (out)
+	{
+		out << output;
+		return 0;
+	}
+	else
+		return 1;
+}
+
 int api_getattr(const char *path, struct stat *stat)
 {
 	const string p(path);
@@ -206,8 +223,6 @@ int api_getattr(const char *path, struct stat *stat)
 
 	if (p == "/clear_cache")
 		stat->st_mode = S_IFREG | 0200;		// Any write /clear_cache
-	else if (p == "/response")
-		stat->st_mode = S_IFREG | 0400;		// Read last response
 	else if (regex_match(p, (regex)"^(.*).json$"))
 		stat->st_mode = S_IFLNK | 0777;		// .json symlinks
 	else if (regex_match(p, (regex)"^(.*)\\{(.*)\\}$"))
@@ -216,6 +231,7 @@ int api_getattr(const char *path, struct stat *stat)
 		stat->st_mode = S_IFREG | 0600;
 	else if (regex_match(p, (regex)"^(.*)/(get|description|summary|options|trace|servers|parameters)$"))
 		stat->st_mode = S_IFREG | 0400;
+	
 	
 	return 0;
 }
@@ -231,12 +247,6 @@ int api_read(const char *path, char *buf, size_t size, off_t offset, struct fuse
 	{
 		((char*)path)[p.length() - 5] = '\0';
 		p = path;
-	}
-
-	if (p == "/response")
-	{
-		strncpy(buf + offset, response.c_str() + offset, len);
-		return len;
 	}
 
 	bname = basename((char*)path);
@@ -275,7 +285,8 @@ int api_read(const char *path, char *buf, size_t size, off_t offset, struct fuse
 	}
 	catch (exception &e)
 	{
-		cerr <<YELLOW<< "WARNING: " << e.what() <<RESET<<endl;
+		string err = (string)YELLOW + "WARNING: " + e.what() + RESET + '\n';
+		clientOut(err, 2);
 		return -ENOENT;
 	}
 	return len;
@@ -289,11 +300,16 @@ int api_write(const char *path, const char *buf, size_t size, off_t offset, stru
 	verb = basename((char*)path);
 	dname = dirname((char*)path);
 
-	// TODO patch vars...
-	if (apiCURL(apiaddr + p, stream, verb, buf))
+	// TODO sanitize vars...
+	if (p == "/clear_cache")
+		cache.clear();
+	else if (apiCURL(apiaddr + p, stream, verb, buf))
+	{
+		clientOut(stream.str(), 2);
 		return -EINVAL;
+	}
 	else
-		response = stream.str();
+		clientOut(stream.str());
 	
 	return size;
 }
@@ -342,11 +358,7 @@ int api_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offse
 	Json::Value::Members rootContents = paths.getMemberNames();
 
 	if (p == "/")
-	{
 		uniques.insert("clear_cache");
-		uniques.insert("response");
-		uniques.insert("response.json");
-	}
 	else
 	{
 		// Get spec attribs
@@ -407,8 +419,7 @@ static int api_readlink(const char *path, char *buf, size_t size)
 	char *bname = basename((char*)path);
 	int blen = strlen(bname);
 
-	cout <<BLUE<< bname <<RESET<< endl;
-	if (regex_match(path, (regex)"^(.*).json$"))
+	if (strlen(bname) > 5 && regex_match(path, (regex)"^(.*).json$"))
 		strncpy(buf, bname, blen - 5);
 	else
 		return 1;

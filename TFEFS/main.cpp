@@ -86,6 +86,24 @@ namespace
     }
 }
 
+// Helper to output a message to the client process stdout or stderr.
+// /proc/{clientPID}/fd/{stream}
+// Defaults to stdout (1), set stream to 2 for stderr.
+// Returns 0 on success or 1 if ostream errors.
+int clientOut(string output, short stream = 1)
+{
+	fuse_context *con = fuse_get_context();
+	ofstream out((string)"/proc/" + to_string(con->pid) + "/fd/" + to_string(stream));
+
+	if (out)
+	{
+		out << output;
+		return 0;
+	}
+	else
+		return 1;
+}
+
 // tfefs GET raw via libcurl
 // Currently supports request GET (default), POST, LIST.
 // TODO: escape environment variables for injection vulnerabilities.
@@ -288,7 +306,11 @@ int tfe_read(const char *path, char *buf, size_t size, off_t offset, struct fuse
 					+ "&filter[workspace][name]=" + basename((char*)path);
 		}
 
-		tfeCURL(endpoint, stream);
+		if (tfeCURL(endpoint, stream))
+		{
+			clientOut(stream.str(), 2);
+			return -EINVAL;
+		}
 		buffer = stream.str();
 	}
 
@@ -318,8 +340,12 @@ int tfe_write(const char *path, const char *buf, size_t size, off_t offset, stru
 
 	// TODO patch vars...
 	if (tfeCURL(apiVers + '/' + p, stream, "PATCH", payload.c_str()))
+	{
+		clientOut(stream.str(), 2);
 		return -EINVAL;
+	}
 
+	clientOut(stream.str());
 	return size;
 }
 

@@ -21,6 +21,7 @@
     <Description>Experimental build of Vault FUSE client in C++.  A horrible mutant combination of C++98/11 plus C.
 
 Requires libcurl, jsoncpp</Description>
+    <ReleaseVersion>0.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -75,6 +76,5 @@ Requires libcurl, jsoncpp</Description>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
-    <Folder Include="Config\vault\" />
   </ItemGroup>
 </Project>

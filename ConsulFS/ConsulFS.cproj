@@ -18,6 +18,7 @@
         <Package file="/usr/lib64/pkgconfig/jsoncpp.pc" name="jsoncpp" IsProject="False" />
       </Packages>
     </Packages>
+    <ReleaseVersion>0.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

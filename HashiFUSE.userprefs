@@ -1,17 +1,13 @@
-﻿<Properties StartupItem="TFEFS/TFEFS.cproj" GitUserInfo="UsingGIT">
+﻿<Properties StartupItem="VaultFS/VaultFS.cproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="TFEFS/main.cpp">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ConsulFS/main.cpp">
     <Files>
-      <File FileName="OpenAPIFS/main.cpp" Line="1" Column="1" />
-      <File FileName="TFEFS/main.cpp" Line="406" Column="31" />
-      <File FileName="../../../../usr/include/c++/11/bits/basic_string.h" Line="6195" Column="1" />
+      <File FileName="ConsulFS/main.cpp" Line="278" Column="4" />
+      <File FileName="TFEFS/main.cpp" Line="29" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/home/jboero/code/hashifuse/test/main.c" line="19" column="1" />
-      <Breakpoint file="/home/jboero/code/hashifuse/OpenAPIFS/main.cpp" line="1184" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
