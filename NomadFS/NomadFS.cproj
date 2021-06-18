@@ -56,6 +56,7 @@
     <None Include="Config\run.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Config\nomadfs.spec" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="main.cpp" />

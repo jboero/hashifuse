@@ -1,5 +1,5 @@
 Name:           nomadfs
-Version:        0.2.1
+Version:        0.2.2
 Release:        1
 Summary:        Hashicorp Consul FUSE Agent
 License:        GPL+

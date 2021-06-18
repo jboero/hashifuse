@@ -71,6 +71,7 @@ Requires libcurl, jsoncpp</Description>
     </None>
     <None Include="Makefile" />
     <None Include="README.md" />
+    <None Include="Config\tfefs.spec" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />

@@ -73,6 +73,7 @@ Requires libcurl, jsoncpp</Description>
     <None Include="Makefile" />
     <None Include="README.md" />
     <None Include="Config\Dockerfile" />
+    <None Include="Config\vaultfs.spec" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />

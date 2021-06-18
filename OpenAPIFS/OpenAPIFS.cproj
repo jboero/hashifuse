@@ -72,6 +72,7 @@ Requires libcurl, jsoncpp</Description>
     </None>
     <None Include="Makefile" />
     <None Include="README.md" />
+    <None Include="Config\openapifs.spec" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
