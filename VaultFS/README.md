@@ -101,3 +101,7 @@ A+SqeEKodL5zZI6C7/bl/6AFXd3qXUMxy6RE8A3D9dEBi0cQ1Pekt0I/FTTUY+FG
 +WyEvaNNkQG3
 -----END CERTIFICATE-----
 ```
+
+# Writing and POST Responses
+I've added a bit of a hack where writes dump any POST response to your process STDOUT.  This isn't typical behaviour for FUSE (or for any filesystem) but yields really interesting results.  For example if you write to an API post endpoint like "transit encrypt" the HTTP response would usually just be output in the FUSE process which isnt' very helpful.  Now it will dump responses out to your client STDOUT, so you can use `tee` or `cp` on the terminal and you will get valuable output.  The example below copies a json payload to a transit encrypt endpoint.  Suddenly the ciphertext response is dumped to the terminal.
+![vaultfstransit](https://user-images.githubusercontent.com/7536012/122565166-1099d980-d03e-11eb-820b-ba5b48698214.gif)
