@@ -19,7 +19,7 @@
       </Packages>
     </Packages>
     <Description>Rough alpha of FUSE client for Kubernetes in C++</Description>
-    <ReleaseVersion>0.2</ReleaseVersion>
+    <ReleaseVersion>0.3</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{46DDC3BA-9691-4278-99D7-23F97F76C619}</ProjectGuid>
+    <ProjectGuid>{46DDC3BA-9691-4278-99D7-23F97F76CACA}</ProjectGuid>
     <Compiler>
       <Compiler ctype="GppCompiler" />
     </Compiler>
@@ -18,7 +18,7 @@
     </Packages>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <Description>Experimental build of Vault FUSE client in C++.  A horrible mutant combination of C++98/11 plus C.
+    <Description>Experimental build of yason FUSE client in C++.  A horrible mutant combination of C++98/11 plus C.
 
 Requires libcurl, jsoncpp</Description>
     <ReleaseVersion>0.3</ReleaseVersion>
@@ -26,40 +26,25 @@ Requires libcurl, jsoncpp</Description>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug</OutputPath>
-    <OutputName>vaultfs</OutputName>
+    <OutputName>yasonfs</OutputName>
     <CompileTarget>Bin</CompileTarget>
     <DefineSymbols>DEBUG MONODEVELOP</DefineSymbols>
     <SourceDirectory>.</SourceDirectory>
     <ExtraCompilerArguments>-g -D_FILE_OFFSET_BITS=64</ExtraCompilerArguments>
-    <Commandlineparameters>-d -s -o direct_io /mnt/vault</Commandlineparameters>
+    <Commandlineparameters>-d -s -o direct_io /mnt/yason</Commandlineparameters>
     <ExtraLinkerArguments>-lfuse</ExtraLinkerArguments>
-    <EnvironmentVariables>
-      <EnvironmentVariables>
-        <Variable name="VAULT_TOKEN" value="s.1Wr8APybB5ecPtugZGGGgAOA" />
-        <Variable name="VAULT_ADDR" value="http://nuc:8200" />
-        <Variable name="no_proxy" value="localhost" />
-        <Variable name="http_proxy" value="" />
-        <Variable name="https_proxy" value="" />
-      </EnvironmentVariables>
-    </EnvironmentVariables>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release</OutputPath>
-    <OutputName>vaultfs</OutputName>
+    <OutputName>yasonfs</OutputName>
     <CompileTarget>Bin</CompileTarget>
     <DefineSymbols>MONODEVELOP</DefineSymbols>
     <SourceDirectory>.</SourceDirectory>
-    <Commandlineparameters>-o big_writes,max_write=262144,max_read=131072 /mnt/gpu</Commandlineparameters>
+    <Commandlineparameters>-o big_writes,max_write=262144,max_read=131072 /mnt/test</Commandlineparameters>
     <ExtraCompilerArguments>-std=c++11 -D_FILE_OFFSET_BITS=64 </ExtraCompilerArguments>
     <Externalconsole>true</Externalconsole>
     <OptimizationLevel>3</OptimizationLevel>
-    <EnvironmentVariables>
-      <EnvironmentVariables>
-        <Variable name="VAULT_TOKEN" value="" />
-        <Variable name="VAULT_ADDR" value="http://localhost:8200" />
-      </EnvironmentVariables>
-    </EnvironmentVariables>
     <ConsolePause>false</ConsolePause>
     <ExtraLinkerArguments>-lrt -lpthread -lfuse -lOpenCL</ExtraLinkerArguments>
   </PropertyGroup>
@@ -73,7 +58,7 @@ Requires libcurl, jsoncpp</Description>
     <None Include="Makefile" />
     <None Include="README.md" />
     <None Include="Config\Dockerfile" />
-    <None Include="Config\vaultfs.spec" />
+    <None Include="Config\yasonfs.spec" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />

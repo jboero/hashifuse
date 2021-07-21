@@ -1,6 +1,10 @@
-﻿<Properties StartupItem="VaultFS/VaultFS.cproj" GitUserInfo="UsingGIT">
+﻿<Properties StartupItem="OpenAPIFS/OpenAPIFS.cproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="OpenAPIFS/main.cpp">
+    <Files>
+      <File FileName="OpenAPIFS/main.cpp" Line="34" Column="21" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

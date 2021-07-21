@@ -36,10 +36,10 @@ Requires libcurl, jsoncpp</Description>
     <ExtraLinkerArguments>-lfuse</ExtraLinkerArguments>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="API_TOKEN" value="X-Vault-Token: root" />
-        <Variable name="API_SPEC" value="http://localhost:8200/v1/sys/internal/specs/openapi" />
+        <Variable name="API_TOKEN" value="X-Vault-Token: s.1Wr8APybB5ecPtugZGGGgAOA" />
+        <Variable name="API_SPEC" value="http://nuc:8200/v1/sys/internal/specs/openapi" />
         <Variable name="API_CACHE_TTL" value="3600" />
-        <Variable name="API_ADDR" value="http://localhost:8200/v1" />
+        <Variable name="API_ADDR" value="http://nuc:8200/v1" />
       </EnvironmentVariables>
     </EnvironmentVariables>
     <ConsolePause>false</ConsolePause>

@@ -18,7 +18,7 @@
         <Package file="/usr/lib64/pkgconfig/libcurl.pc" name="libcurl" IsProject="False" />
       </Packages>
     </Packages>
-    <ReleaseVersion>0.2</ReleaseVersion>
+    <ReleaseVersion>0.3</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

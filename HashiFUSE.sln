@@ -13,6 +13,8 @@ Project("{2857B73E-F847-4B02-9238-064979017E93}") = "TFEFS", "TFEFS\TFEFS.cproj"
 EndProject
 Project("{2857B73E-F847-4B02-9238-064979017E93}") = "OpenAPIFS", "OpenAPIFS\OpenAPIFS.cproj", "{46DDC3BA-9691-4278-99D7-23F97F76C614}"
 EndProject
+Project("{2857B73E-F847-4B02-9238-064979017E93}") = "YaSonFS", "YaSonFS\YaSonFS.cproj", "{46DDC3BA-9691-4278-99D7-23F97F76CACA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,8 @@ Global
 		{46DDC3BA-9691-4278-99D7-23F97F76C619}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46DDC3BA-9691-4278-99D7-23F97F76C619}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46DDC3BA-9691-4278-99D7-23F97F76C619}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46DDC3BA-9691-4278-99D7-23F97F76CACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46DDC3BA-9691-4278-99D7-23F97F76CACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FB1D905-A0C2-499F-A125-B179635BB84D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6FB1D905-A0C2-499F-A125-B179635BB84D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FB1D905-A0C2-499F-A125-B179635BB84D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -52,6 +56,6 @@ Global
 		$0.VersionControlPolicy = $2
 		$2.inheritsSet = Mono
 		description = Set of FUSE clients for Hashicorp stack.
-		version = 0.2
+		version = 0.3
 	EndGlobalSection
 EndGlobal

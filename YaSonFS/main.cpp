@@ -101,23 +101,6 @@ int clientOut(string output, short stream = 1)
 		return 1;
 }
 
-void clientHeaders(struct curl_slist **headers)
-{
-	fuse_context *con = fuse_get_context();
-	ifstream envin((string)"/proc/" + to_string(con->pid) + "/environ");
-	string line;
-	while(getline(envin, line, '\0'))
-	{
-		if (regex_match(line, (regex)"H_.*"))
-		{
-			line = line.substr(2);
-			replace(line.begin(), line.end(), '=', ':');
-			cout << line << endl;
-			*headers = curl_slist_append(*headers, line.c_str());
-		}
-	}
-}
-
 // Vault GET raw via libcurl
 // Currently supports request GET (default), POST, LIST.
 // TODO: escape environment variables for injection vulnerabilities.
@@ -132,7 +115,6 @@ int	vaultCURL(string url, stringstream &httpData, string request = "GET", const 
 	if (getenv("VAULT_NAMESPACE"))
 		headers = curl_slist_append(headers, (nsHeader + getenv("VAULT_NAMESPACE")).c_str());
 
-	clientHeaders(&headers);
 	url = (string)getenv("VAULT_ADDR") + url;
 
 	#if DEBUG
