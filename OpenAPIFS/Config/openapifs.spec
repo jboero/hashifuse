@@ -1,7 +1,7 @@
 Name:           openapifs
 Version:        0.2
 Release:        1
-Summary:        Hashicorp Terraform Enterprise Fuse Agent
+Summary:        OpenAPI Spec FUSE Filesystem Agent
 License:        GPL+
 Source0:        https://github.com/jboero/hashifuse/archive/master.zip
 Requires:       libcurl fuse jsoncpp
