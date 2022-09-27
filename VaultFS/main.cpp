@@ -64,7 +64,7 @@ static Json::Value gMounts;
 // Protect multi-threaded mode from libcurl/libopenssl race condition.
 mutex curlmutex;
 
-// Store the vault token so we can clearenv the env var.
+// Store the vault token so we can unsetenv the env var.
 // TODO: use memfd_secret for kernel 5.14+
 static string vault_token;
 
@@ -662,7 +662,7 @@ int main(int argc, char *argv[])
 {
 	// Right away save VAULT_TOKEN and clear the env var.
 	vault_token = getenv("VAULT_TOKEN");
-	clearenv("VAULT_TOKEN");
+	unsetenv("VAULT_TOKEN");
 	
 	struct fuse_operations fuse = 
 	{
