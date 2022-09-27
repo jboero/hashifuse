@@ -1,5 +1,5 @@
 Name:           vaultfs
-Version:        0.2
+Version:        0.3
 Release:        1
 Summary:        Hashicorp VaultFS Fuse Agent
 License:        GPL+
