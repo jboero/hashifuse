@@ -64,6 +64,10 @@ static Json::Value gMounts;
 // Protect multi-threaded mode from libcurl/libopenssl race condition.
 mutex curlmutex;
 
+// Store the vault token so we can clearenv the env var.
+// TODO: use memfd_secret for kernel 5.14+
+static string vault_token;
+
 // CURL callback
 namespace
 {
@@ -126,7 +130,7 @@ int	vaultCURL(string url, stringstream &httpData, string request = "GET", const 
 	int res = 0, httpCode = 0;
 	string tokenHeader = "X-Vault-Token: ";
 	string nsHeader = "X-Vault-Namespace: ";
-	struct curl_slist *headers = curl_slist_append(NULL, (tokenHeader + getenv("VAULT_TOKEN")).c_str());
+	struct curl_slist *headers = curl_slist_append(NULL, (tokenHeader + vault_token).c_str());
 	CURL* curl;
 
 	if (getenv("VAULT_NAMESPACE"))
@@ -656,6 +660,10 @@ int vault_truncate(const char *path, off_t newsize)
 
 int main(int argc, char *argv[])
 {
+	// Right away save VAULT_TOKEN and clear the env var.
+	vault_token = getenv("VAULT_TOKEN");
+	clearenv("VAULT_TOKEN");
+	
 	struct fuse_operations fuse = 
 	{
 		.getattr = vault_getattr,
