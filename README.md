@@ -1,3 +1,11 @@
+> ## ⚠️ Legacy — abandoned
+> This repository is **archived and no longer maintained**. It is preserved for historical reference only.
+>
+> **KubernetesFS (K8sFS)** has moved to its own repository, where development continues:
+> **https://github.com/jboero/k8sfs**
+>
+> The remaining filesystems here (ConsulFS, VaultFS, NomadFS, TFEFS, HCPFS, OpenAPIFS, YaSonFS) are legacy proof-of-concept code and are not maintained.
+
 # Why HashiFUSE?
 Experimental FUSE clients for Hashicorp REST APIs.  These make it simple to adopt Hashicorp products by mapping basic REST API functions to FUSE filesystems.  Note they are beta PoC.  Do not use them for any production clusters.  This is not my prettiest code but it tends to work fairly well.
 
@@ -37,6 +45,8 @@ Demo:
 ![TFEFS Demo Webp](tfefs.webp)
 
 # KubernetesFS
+**Moved to its own repository: https://github.com/jboero/k8sfs** (active development continues there).
+
 Kubernetes namespace browser, allowing access to all resources in K8s v1.14.  This includes, DaemonSets, Deployments, RCs, Pods, Services, and more. Experimental.  Works with OpenShift too.  Versions subject to unknown compatibility.
 
 Demo Video:
